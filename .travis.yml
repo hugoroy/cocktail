@@ -1,6 +1,13 @@
 before_install:
   - sudo apt-get -qq update
+  - sudo apt-get install -y liblwp-protocol-https-perl
   - sudo apt-get install -y pandoc
+  - sudo apt-get install -y pandoc-citeproc
+  - sudo apt-get install -y pandoc-crossref
+  - "cpanm Moo"
   - "cpanm Pandoc"
 language: perl
-
+  - "5.18"
+  - "5.20"
+  - "5.22"
+  - "5.24"
