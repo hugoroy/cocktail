@@ -198,16 +198,18 @@ release_project() {
 }
 
 usage() {
-  cocktail -b url_base -d dossier -p projet [ -g url_garde ]
+  
+  echo "cocktail -b url_base -d dossier [ -h ] -p projet [ -g url_garde ]
       -b : url du pad principal
       -d : nom du dossier
       -g : url du pad de page de garde (optionnel)
-      -p : nom du projet
+      -h : cette page d'aide
+      -p : nom du projet"
 }
 
 ### MAIN ###
 OPTERR=1
-while getopts "b:d:g:p:" option;
+while getopts "b:d:g:p:h" option;
 do
   case $option in
     b)
@@ -221,6 +223,10 @@ do
     g)
         URL_GARDE=$OPTARG
         verbose "getopts: -$option) URL_GARDE=$URL_GARDE"
+        ;;
+    h)
+        usage
+        exit
         ;;
     p)
         PROJET=$OPTARG
