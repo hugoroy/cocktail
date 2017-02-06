@@ -1,7 +1,13 @@
 #!/bin/bash
 
 VERBOSE=1
-DEBUG=0
+DEBUG=1
+
+PANDOC_FILTER_BASE=/home/sniperovitch/exegetesDoc/filters
+PANDOC_INCLUDE_BASE=/home/sniperovitch/exegetesDoc/pandocincludes
+WORKING_FOLDER=/home/sniperovitch/tmp
+
+STORE=/tmp/exegetes
 
 # exemple
 # ./cocktail.sh -d MonDossier -p Abro2 -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt'
@@ -31,6 +37,31 @@ init_check() {
     die "$FUNCNAME lock=$LOCK_FILE exists. Wait compilation or erase it"
   fi
 
+  # PANDOC_FILTER_BASE should exists
+  if test ! -d "$PANDOC_FILTER_BASE";
+  then
+    die "$FUNCNAME: PANDOC_FILTER_BASE=$PANDOC_FILTER_BASE unavailable"
+  fi
+
+  # PANDOC_INCLUDE_BASE should exists
+  if test ! -d "$PANDOC_INCLUDE_BASE";
+  then
+    die "$FUNCNAME: PANDOC_INCLUDE_BASE=$PANDOC_INCLUDE_BASE unavailable"
+  fi
+
+  # STORE should exists
+  if test ! -d "$STORE" -o ! -w "$STORE";
+  then
+    die "$FUNCNAME: STORE=$STORE should be a writable folder"
+  fi
+
+  # WORKING_FOLDER should exists
+  if test ! -d "$WORKING_FOLDER" -o ! -w "$WORKING_FOLDER";
+  then
+    die "$FUNCNAME: WORKING_FOLDER=$WORKING_FOLDER should be a writable folder"
+  fi
+
+  # external tools
   for tool in touch curl pandoc pdflatex
   do
     local tool_location=$(command -v $tool)
@@ -81,7 +112,7 @@ pad2json() {
 }
 
 pad2docx() {
-  debug "$FUNCNAME ARGS:$@"
+  debug "$FUNCNAME PWD:$PWD ARGS:$@"
   if test $# -ne 2;
   then
     die 'usage: $FUNCNAME input_file output_file'
@@ -89,7 +120,7 @@ pad2docx() {
 
   local input=$1
   local output=$2
-  local refdoc=../../exegetesDoc/pandocincludes/exegetes.docx
+  local refdoc="$PANDOC_INCLUDE_BASE/exegetes.docx"
   verbose "$FUNCNAME input=$input output=$output"
 
   if ! test -e "$refdoc";
@@ -102,9 +133,9 @@ pad2docx() {
     -o "$output" -t docx --self-contained --smart \
     --reference-docx="$refdoc" \
     --filter pandoc-citeproc \
-    --filter ../../exegetesDoc/filters/docx.zsh \
-    --filter ../../exegetesDoc/filters/nettoyage.zsh \
-    --filter ../../exegetesDoc/filters/nettoyage-etendu.zsh
+    --filter $PANDOC_FILTER_BASE/docx.zsh \
+    --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
+    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh
 }
 
 pad2html() {
@@ -122,9 +153,9 @@ pad2html() {
     -f markdown "$input" \
     -o "$output" -t html --self-contained --smart \
     --filter pandoc-citeproc \
-    --filter ../../exegetesDoc/filters/html.zsh \
-    --filter ../../exegetesDoc/filters/nettoyage.zsh \
-    --filter ../../exegetesDoc/filters/nettoyage-etendu.zsh
+    --filter $PANDOC_FILTER_BASE/html.zsh \
+    --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
+    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh
 }
 
 pad2markdown() {
@@ -143,9 +174,9 @@ pad2markdown() {
     -o "$output" -t markdown --wrap=none --self-contained --smart \
     --reference-location=block --reference-links \
     --filter pandoc-citeproc \
-    --filter ../../exegetesDoc/filters/markdown.zsh \
-    --filter ../../exegetesDoc/filters/nettoyage.zsh \
-    --filter ../../exegetesDoc/filters/nettoyage-etendu.zsh
+    --filter $PANDOC_FILTER_BASE/markdown.zsh \
+    --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
+    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh
 }
 
 pad2tex() {
@@ -164,10 +195,10 @@ pad2tex() {
     -o "$output" -t latex --self-contained \
     --template ../../exegetesDoc/pandocincludes/exegetes.latex \
     --filter pandoc-citeproc \
-    --filter ../../exegetesDoc/filters/latex.zsh \
-    --filter ../../exegetesDoc/filters/nettoyage.zsh \
+    --filter $PANDOC_FILTER_BASE/latex.zsh \
+    --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
     --filter pandoc-latex-environment \
-    --filter ../../exegetesDoc/filters/paranumero.bash
+    --filter $PANDOC_FILTER_BASE/paranumero.bash
 }
 
 tex2pdf() {
@@ -181,10 +212,8 @@ tex2pdf() {
   local output=$2
   verbose "$FUNCNAME input=$input output=$output"
 
-  mkdir pdftmp && \
-  pdflatex -interaction=nonstopmode -output-directory=pdftmp "$input" >/dev/null
-  pdflatex -interaction=nonstopmode -output-directory=pdftmp "$input" >/dev/null
-  mv "pdftmp/$output" "./$output"
+  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null
+  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null
 }
 
 lock_project() {
@@ -205,6 +234,13 @@ usage() {
       -g : url du pad de page de garde (optionnel)
       -h : cette page d'aide
       -p : nom du projet"
+}
+
+publish() {
+    for ext in pdf docx html txt
+    do
+      cp -vf "$WORKING_FOLDER/$PROJET.$ext" "$STORE/$PROJET.$ext"
+    done
 }
 
 ### MAIN ###
@@ -243,36 +279,44 @@ then
   die "getopts: -d DOSSIER is mandatory"
 fi
 
+verbose "DOSSIER=$DOSSIER"
+WORKING_FOLDER="$WORKING_FOLDER/$DOSSIER"
+verbose "WORKING_FOLDER=$WORKING_FOLDER"
+mkdir -p "$WORKING_FOLDER"
+cd "$WORKING_FOLDER" || die "we can't change to \"$WORKING_FOLDER\" folder"
+
+STORE="$STORE/$DOSSIER"
+
+verbose "STORE=$STORE"
+mkdir -p "$STORE"
+LOCK_FILE="$WORKING_FOLDER/$PROJET.lock"
+verbose "LOCK_FILE=$LOCK_FILE"
+
 if test -z "$URL_BASE";
 then
   die "getopts: -b URL_BASE is mandatory"
 fi
 
-LOCK_FILE="$PROJET.lock"
-echo "[$PROJET]"
-
-mkdir -p "$DOSSIER"
-cd "$DOSSIER" || die
-
 init_check
 lock_project
-mirror_pad "$URL_BASE" "$PROJET.txt"
+mirror_pad "$URL_BASE" "$WORKING_FOLDER/$PROJET.txt"
 
 if test "$URL_GARDE";
 then
-  mirror_pad "$URL_GARDE" "garde.tex"
+  mirror_pad "$URL_GARDE" "$WORKING_FOLDER/garde.tex"
 fi
 
 
 # hack specifique Abro Tele2
-touch annexe-tableau.tex
+touch "$WORKING_FOLDER/annexe-tableau.tex"
 
-pad2json "$PROJET.txt" "$PROJET.json"
-pad2docx "$PROJET.txt" "$PROJET.docx"
-pad2html "$PROJET.txt" "$PROJET.html"
-pad2markdown "$PROJET.txt" "$PROJET.markdown.txt"
-pad2tex "$PROJET.txt" "$PROJET.tex"
-tex2pdf "$PROJET.tex" "$PROJET.pdf"
+pad2json "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.json"
+pad2docx "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.docx"
+pad2html "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.html"
+pad2markdown "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.markdown.txt"
+pad2tex "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.tex"
+tex2pdf "$WORKING_FOLDER/$PROJET.tex" "$WORKING_FOLDER/$PROJET.pdf"
+publish
 release_project
 exit
 
