@@ -3,11 +3,8 @@
 VERBOSE=1
 DEBUG=0
 
-PROJET=MonProjet
-DOSSIER=MonDossier
-URL_BASE='https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt'
-URL_GARDE='https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt'
-
+# exemple
+# ./cocktail.sh -d MonDossier -p Abro2 -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt'
 
 die() {
   echo -e "$@" >&2
@@ -34,7 +31,7 @@ init_check() {
     die "$FUNCNAME lock=$LOCK_FILE exists. Wait compilation or erase it"
   fi
 
-  for tool in touch curl pandoc pdflatex
+  for tool in touch curl pandoc
   do
     local tool_location=$(command -v $tool)
     if test "$tool_location";
@@ -188,8 +185,6 @@ tex2pdf() {
   pdflatex -interaction=nonstopmode -output-directory=pdftmp "$input" >/dev/null
   pdflatex -interaction=nonstopmode -output-directory=pdftmp "$input" >/dev/null
   mv "pdftmp/$output" "./$output"
-
-#  rm *.aux && rm *.out && rm *.log 
 }
 
 lock_project() {
@@ -202,15 +197,50 @@ release_project() {
   rm -f $LOCK_FILE
 }
 
-#if test "$1";
-#then
-#  URL_BASE=$1
-#  tmp=${URL_BASE#*$}              # remove prefix ending in "$"
-#  tmp=${tmp%-Principal/export*}   # remove suffix starting with
-#  tmp=${tmp%-Garde/export*}       # remove suffix starting with
-#  PROJET=$tmp
-#fi
+usage() {
+  cocktail -b url_base -d dossier -p projet [ -g url_garde ]
+      -b : url du pad principal
+      -d : nom du dossier
+      -g : url du pad de page de garde (optionnel)
+      -p : nom du projet
+}
 
+### MAIN ###
+OPTERR=1
+while getopts "b:d:g:p:" option;
+do
+  case $option in
+    b)
+        URL_BASE=$OPTARG
+        verbose "getopts: -$option) URL_BASE=$URL_BASE"
+        ;;
+    d)
+        DOSSIER=$OPTARG
+        verbose "getopts: -$option) DOSSIER=$DOSSIER"
+        ;;
+    g)
+        URL_GARDE=$OPTARG
+        verbose "getopts: -$option) URL_GARDE=$URL_GARDE"
+        ;;
+    p)
+        PROJET=$OPTARG
+        verbose "getopts: -$option) PROJET=$PROJET"
+        ;;
+  esac
+done
+
+shift $(($OPTIND - 1))
+verbose "ARGS=$@"
+
+if test -z "$DOSSIER";
+then
+  die "getopts: -d DOSSIER is mandatory"
+fi
+
+if test -z "$URL_BASE";
+then
+  die "getopts: -b URL_BASE is mandatory"
+fi
 
 LOCK_FILE="$PROJET.lock"
 echo "[$PROJET]"
@@ -221,9 +251,16 @@ cd "$DOSSIER" || die
 init_check
 lock_project
 mirror_pad "$URL_BASE" "$PROJET.txt"
-mirror_pad "$URL_GARDE" "garde.tex"
+
+if test "$URL_GARDE";
+then
+  mirror_pad "$URL_GARDE" "garde.tex"
+fi
+
+
 # hack specifique Abro Tele2
 touch annexe-tableau.tex
+
 pad2json "$PROJET.txt" "$PROJET.json"
 pad2docx "$PROJET.txt" "$PROJET.docx"
 pad2html "$PROJET.txt" "$PROJET.html"
