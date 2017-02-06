@@ -4,6 +4,7 @@ VERBOSE=1
 DEBUG=0
 
 PROJET=MonProjet
+DOSSIER=MonDossier
 URL_BASE='https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt'
 URL_GARDE='https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt'
 
@@ -201,21 +202,21 @@ release_project() {
   rm -f $LOCK_FILE
 }
 
-if test "$1";
-then
-  URL_BASE=$1
-  tmp=${URL_BASE#*$}              # remove prefix ending in "$"
-  tmp=${tmp%-Principal/export*}   # remove suffix starting with
-  tmp=${tmp%-Garde/export*}       # remove suffix starting with
-  PROJET=$tmp
-fi
+#if test "$1";
+#then
+#  URL_BASE=$1
+#  tmp=${URL_BASE#*$}              # remove prefix ending in "$"
+#  tmp=${tmp%-Principal/export*}   # remove suffix starting with
+#  tmp=${tmp%-Garde/export*}       # remove suffix starting with
+#  PROJET=$tmp
+#fi
 
 
 LOCK_FILE="$PROJET.lock"
 echo "[$PROJET]"
 
-mkdir -p "$PROJET"
-cd "$PROJET" || die
+mkdir -p "$DOSSIER"
+cd "$DOSSIER" || die
 
 init_check
 lock_project
