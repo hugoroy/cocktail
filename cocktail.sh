@@ -31,7 +31,7 @@ init_check() {
     die "$FUNCNAME lock=$LOCK_FILE exists. Wait compilation or erase it"
   fi
 
-  for tool in touch curl pandoc
+  for tool in touch curl pandoc pdflatex
   do
     local tool_location=$(command -v $tool)
     if test "$tool_location";
