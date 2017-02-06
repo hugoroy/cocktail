@@ -4,3 +4,5 @@
 - Meilleure usage()
 - meilleure gestions des logs/erreurs pour donner plus de souplesse à Bartender (partie web)
 
+
+- contraintes : exegetesDoc doit être au même niveau que cocktail à cause des appels relatifs dans les pads.
