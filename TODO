@@ -1,0 +1,6 @@
+- Recevoir plusieurs URL de pad de base (-b) pour les traiter par lots
+- Un fichier de configuration
+- Config: spécifier les emplacements des filtres ne pas avoir des chemins dans cocktail
+- Meilleure usage()
+- meilleure gestions des logs/erreurs pour donner plus de souplesse à Bartender (partie web)
+
