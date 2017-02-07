@@ -241,9 +241,12 @@ publish() {
 }
 
 ### MAIN ###
-if test -e "cocktail.conf";
+base=$( cd $( dirname "${BASH_SOURCE[0]}" ) && pwd )
+
+echo "base=$base"
+if test -e "$base/cocktail.conf";
 then
-  source "cocktail.conf"
+  source "$base/cocktail.conf"
 else
   die "cocktail.conf is missing, see config.conf.smp for example"
 fi
