@@ -226,7 +226,8 @@ usage() {
       -d : nom du dossier
       -g : url du pad de page de garde (optionnel)
       -h : cette page d'aide
-      -p : nom du projet"
+      -p : nom du projet
+      -v : force le mode verbeux"
 }
 
 publish() {
@@ -248,7 +249,7 @@ else
 fi
 
 OPTERR=1
-while getopts "b:d:g:p:h" option;
+while getopts "b:d:g:p:hv" option;
 do
   case $option in
     b)
@@ -269,6 +270,11 @@ do
         ;;
     p)
         PROJET=$OPTARG
+        verbose "getopts: -$option) PROJET=$PROJET"
+        ;;
+    v)
+        # Override verbose
+        VERBOSE=1
         verbose "getopts: -$option) PROJET=$PROJET"
         ;;
   esac
