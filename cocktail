@@ -215,9 +215,10 @@ lock_project() {
 
 release_project() {
   verbose "$FUNCNAME $PROJET released"
-  if test -e "$LOCKFILE";
+  if test -e "$LOCK_FILE";
   then
-    rm -f $LOCK_FILE
+    verbose "$FUNCNAME lock=$LOCK_FILE exists, delete"
+    rm -f "$LOCK_FILE"
   fi
 }
 
