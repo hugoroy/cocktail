@@ -235,7 +235,10 @@ usage() {
 publish() {
     for ext in pdf docx html txt
     do
-      cp -vf "$WORKING_FOLDER/$PROJET.$ext" "$STORE/$PROJET.$ext"
+      local from="$WORKING_FOLDER/$PROJET.$ext"
+      local to="$STORE/$PROJET.$ext"
+      verbose "$from -> $to"
+      cp -f "$from" "$to"
     done
 }
 
