@@ -289,7 +289,7 @@ STORE="$STORE/$DOSSIER"
 
 verbose "STORE=$STORE"
 mkdir -p "$STORE"
-LOCK_FILE="$WORKING_FOLDER/$PROJET.lock"
+LOCK_FILE="$STORE/$PROJET.lock"
 verbose "LOCK_FILE=$LOCK_FILE"
 
 if test -z "$URL_BASE";
