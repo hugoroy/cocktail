@@ -7,7 +7,10 @@ end_with_code() {
     rc=1
   fi
 
-  cleanup_working_folder
+  if test "$rc" -eq 0;
+  then
+    cleanup_working_folder
+  fi
   unlock_project
   verbose "[$FUNCNAME] exiting with RC=[$rc]"
   exit $rc
@@ -87,13 +90,13 @@ mirror_pad() {
   verbose "[$FUNCNAME] url=$url filename=$filename"
   RESPONSE=$(curl --silent --show-error $url --output $filename 2>&1)
   RC=$?
-  local errstr="[$FUNCNAME] url=$url filename$filename [RC:$RC] $RESPONSE"
-  if test "$RC" -gt 0;
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
   then
+    verbose "$errstr"
+  else
     die "$errstr"
   fi
-
-  verbose "$errstr"
 }
 
 pad2json() {
@@ -106,10 +109,17 @@ pad2json() {
   local input=$1
   local output=$2
   verbose "[$FUNCNAME] input=$input output=$output"
-
-  pandoc \
+  RESPONSE=$(pandoc \
     -f markdown "$input" \
-    -o "$output" -t json --self-contained
+    -o "$output" -t json --self-contained)
+  RC=$?
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
+  then
+    verbose "$errstr"
+  else
+    die "$errstr"
+  fi
 }
 
 pad2docx() {
@@ -129,14 +139,22 @@ pad2docx() {
     die "[$FUNCNAME] refdoc=$refdoc unavailable"
   fi
 
-  pandoc \
+  RESPONSE=$(pandoc \
     -f markdown "$input" \
     -o "$output" -t docx --self-contained --smart \
     --reference-docx="$refdoc" \
     --filter pandoc-citeproc \
     --filter $PANDOC_FILTER_BASE/docx.zsh \
     --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
-    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh
+    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh)
+  RC=$?
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
+  then
+    verbose "$errstr"
+  else
+    die "$errstr"
+  fi
 }
 
 pad2html() {
@@ -150,13 +168,21 @@ pad2html() {
   local output=$2
   verbose "[$FUNCNAME] input=$input output=$output"
 
-  pandoc \
+  RESPONSE=$(pandoc \
     -f markdown "$input" \
     -o "$output" -t html --self-contained --smart \
     --filter pandoc-citeproc \
     --filter $PANDOC_FILTER_BASE/html.zsh \
     --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
-    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh
+    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh)
+  RC=$?
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
+  then
+    verbose "$errstr"
+  else
+    die "$errstr"
+  fi
 }
 
 pad2markdown() {
@@ -170,14 +196,22 @@ pad2markdown() {
   local output=$2
   verbose "[$FUNCNAME] input=$input output=$output"
 
-  pandoc \
+  RESPONSE=$(pandoc \
     -f markdown "$input" \
     -o "$output" -t markdown --wrap=none --self-contained --smart \
     --reference-location=block --reference-links \
     --filter pandoc-citeproc \
     --filter $PANDOC_FILTER_BASE/markdown.zsh \
     --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
-    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh
+    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh)
+  RC=$?
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
+  then
+    verbose "$errstr"
+  else
+    die "$errstr"
+  fi
 }
 
 pad2tex() {
@@ -191,7 +225,7 @@ pad2tex() {
   local output=$2
   verbose "[$FUNCNAME] input=$input output=$output"
 
-  pandoc \
+  RESPONSE=$(pandoc \
     -f markdown "$input" \
     -o "$output" -t latex --self-contained \
     --template ../../exegetesDoc/pandocincludes/exegetes.latex \
@@ -199,7 +233,15 @@ pad2tex() {
     --filter $PANDOC_FILTER_BASE/latex.zsh \
     --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
     --filter pandoc-latex-environment \
-    --filter $PANDOC_FILTER_BASE/paranumero.bash
+    --filter $PANDOC_FILTER_BASE/paranumero.bash)
+  RC=$?
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
+  then
+    verbose "$errstr"
+  else
+    die "$errstr"
+  fi
 }
 
 tex2pdf() {
@@ -213,8 +255,15 @@ tex2pdf() {
   local output=$2
   verbose "[$FUNCNAME] input=$input output=$output"
 
-  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null
-  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null
+  # pdflatex sort avec un code 1 mais genere le PDF on peut pas die sur RC>0 ici
+  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" > "$WORKING_FOLDER/pdflatex_passe1.log" 2>&1
+  verbose "[$FUNCNAME] Passe 1 RC=[$?]"
+  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" > "$WORKING_FOLDER/pdflatex_passe2.log" 2>&1
+  verbose "[$FUNCNAME] Passe 2 RC=[$?]"
+  if test ! -e "$output";
+  then
+    die "[$FUNCNAME] Génération du PDF '$putput' en erreur"
+  fi
 }
 
 lock_project() {
