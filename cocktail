@@ -87,13 +87,13 @@ mirror_pad() {
   verbose "[$FUNCNAME] url=$url filename=$filename"
   RESPONSE=$(curl --silent --show-error $url --output $filename 2>&1)
   RC=$?
-  local errstr="[$FUNCNAME] url=$url filename$filename [RC:$RC] $RESPONSE"
-  if test "$RC" -gt 0;
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
   then
+    verbose "$errstr"
+  else
     die "$errstr"
   fi
-
-  verbose "$errstr"
 }
 
 pad2json() {
@@ -106,14 +106,16 @@ pad2json() {
   local input=$1
   local output=$2
   verbose "[$FUNCNAME] input=$input output=$output"
-
   RESPONSE=$(pandoc \
     -f markdown "$input" \
     -o "$output" -t json --self-contained)
   RC=$?
-  if test "$RC" -gt 0;
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
   then
-    die "[$FUNCNAME] RC=[$RC] $RESPONSE"
+    verbose "$errstr"
+  else
+    die "$errstr"
   fi
 }
 
