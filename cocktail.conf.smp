@@ -1,9 +1,9 @@
 VERBOSE=1
 DEBUG=0
 
-PANDOC_FILTER_BASE=/home/bernard/exegetesDoc/filters
-PANDOC_INCLUDE_BASE=/home/bernard/exegetesDoc/pandocincludes
-WORKING_FOLDER=/home/bernard/tmp
+PANDOC_FILTER_BASE=$HOME/exegetesDoc/filters
+PANDOC_INCLUDE_BASE=$HOME/exegetesDoc/pandocincludes
+WORKING_FOLDER=$HOME/tmp
 
-STORE=/var/www/exegetes
+STORE=$HOME/store
 
