@@ -2,7 +2,7 @@
 
 die() {
   echo -e "$@" >&2
-  release_project
+  unlock_project
   exit 1
 }
 
@@ -210,13 +210,13 @@ lock_project() {
   touch $LOCK_FILE
 }
 
-release_project() {
+unlock_project() {
   if test -e "$LOCK_FILE";
   then
     verbose "$FUNCNAME lock=$LOCK_FILE exists, delete"
     rm -f "$LOCK_FILE"
   fi
-  verbose "$FUNCNAME $PROJET released"
+  verbose "$FUNCNAME $PROJET unlocked"
 }
 
 usage() {
@@ -329,6 +329,6 @@ pad2markdown "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.markdown.txt
 pad2tex "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.tex"
 tex2pdf "$WORKING_FOLDER/$PROJET.tex" "$WORKING_FOLDER/$PROJET.pdf"
 publish
-release_project
+unlock_project
 exit
 
