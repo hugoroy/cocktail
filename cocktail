@@ -226,8 +226,14 @@ unlock_project() {
   then
     verbose "$FUNCNAME lock=$LOCK_FILE exists, delete"
     rm -f "$LOCK_FILE"
+    if test ! -e "$LOCK_FILE";
+    then
+      verbose "$FUNCNAME $PROJET unlocked, $LOCK_FILE removed."
+    else
+      # we can'nt call die inside a function called by die
+      verbose "$FUNCNAME we can not unlock $PROJET, $LOCK_FILE still on disk."
+    fi
   fi
-  verbose "$FUNCNAME $PROJET unlocked"
 }
 
 cleanup_working_folder() {
