@@ -7,7 +7,10 @@ end_with_code() {
     rc=1
   fi
 
-  cleanup_working_folder
+  if test "$rc" -eq 0;
+  then
+    cleanup_working_folder
+  fi
   unlock_project
   verbose "[$FUNCNAME] exiting with RC=[$rc]"
   exit $rc
@@ -252,24 +255,8 @@ tex2pdf() {
   local output=$2
   verbose "[$FUNCNAME] input=$input output=$output"
 
-  RESPONSE=$(pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null)
-  RC=$?
-  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
-  if test "$RC" -eq 0;
-  then
-    verbose "$errstr"
-  else
-    die "$errstr"
-  fi
-  RESPONSE=$(pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null)
-  RC=$?
-  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
-  if test "$RC" -eq 0;
-  then
-    verbose "$errstr"
-  else
-    die "$errstr"
-  fi
+  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null
+  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null
 }
 
 lock_project() {
