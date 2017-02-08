@@ -234,7 +234,7 @@ cleanup_working_folder() {
   verbose "$FUNCNAME WORKING_FOLDER=$WORKING_FOLDER"
   if test -n "$WORKING_FOLDER" -a -d "$WORKING_FOLDER";
   then
-    if "$VERBOSE" -eq 1;
+    if test "$VERBOSE" -eq 1;
     then
       rm --recursive --verbose "$WORKING_FOLDER"
     else
