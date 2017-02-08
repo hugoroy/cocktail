@@ -271,9 +271,7 @@ publish() {
 
 ### MAIN ###
 base=$( cd $( dirname "${BASH_SOURCE[0]}" ) && pwd )
-
-echo "base=$base"
-if test -e "$base/cocktail.conf";
+if test -r "$base/cocktail.conf";
 then
   source "$base/cocktail.conf"
 else
