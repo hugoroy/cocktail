@@ -219,6 +219,14 @@ unlock_project() {
   verbose "$FUNCNAME $PROJET unlocked"
 }
 
+cleanup_working_folder() {
+  verbose "$FUNCNAME WORKING_FOLDER=$WORKING_FOLDER"
+  if test -n "$WORKING_FOLDER" -a test -d "$WORKING_FOLDER";
+  then
+    rm -rf "$WORKING_FOLDER/*" && rmdir "$WORKING_FOLDER"
+  fi
+}
+
 usage() {
   
   echo "cocktail -b url_base -d dossier [ -h ] -p projet [ -g url_garde ]
