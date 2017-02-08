@@ -1,7 +1,7 @@
 language: c
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y pandoc
+  - sudo apt-get install -y pandoc texlive-latex-base
 
 script:
   - ./build.sh
