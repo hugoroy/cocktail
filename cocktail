@@ -361,7 +361,7 @@ do
     v)
         # Override verbose
         VERBOSE=1
-        verbose "getopts: -$option) PROJET=$PROJET"
+        verbose "getopts: -$option) VERBOSE=$VERBOSE"
         ;;
   esac
 done
