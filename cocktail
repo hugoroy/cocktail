@@ -107,9 +107,14 @@ pad2json() {
   local output=$2
   verbose "[$FUNCNAME] input=$input output=$output"
 
-  pandoc \
+  RESPONSE=$(pandoc \
     -f markdown "$input" \
-    -o "$output" -t json --self-contained
+    -o "$output" -t json --self-contained)
+  RC=$?
+  if test "$RC" -gt 0;
+  then
+    die "[$FUNCNAME] RC=[$RC] $RESPONSE"
+  fi
 }
 
 pad2docx() {
@@ -129,14 +134,19 @@ pad2docx() {
     die "[$FUNCNAME] refdoc=$refdoc unavailable"
   fi
 
-  pandoc \
+  RESPONSE=$(pandoc \
     -f markdown "$input" \
     -o "$output" -t docx --self-contained --smart \
     --reference-docx="$refdoc" \
     --filter pandoc-citeproc \
     --filter $PANDOC_FILTER_BASE/docx.zsh \
     --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
-    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh
+    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh)
+  RC=$?
+  if test "$RC" -gt 0;
+  then
+    die "[$FUNCNAME] RC=[$RC] $RESPONSE"
+  fi
 }
 
 pad2html() {
