@@ -255,8 +255,15 @@ tex2pdf() {
   local output=$2
   verbose "[$FUNCNAME] input=$input output=$output"
 
-  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null
-  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null
+  # pdflatex sort avec un code 1 mais genere le PDF on peut pas die sur RC>0 ici
+  RC=$(pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null)
+  verbose "[$FUNCNAME] Passe 1 RC=[$RC]"
+  RC=$(pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null)
+  verbose "[$FUNCNAME] Passe 2 RC=[$RC]"
+  if test ! -e "$output";
+  then
+    die "[$FUNCNAME] Génération du PDF '$putput' en erreur"
+  fi
 }
 
 lock_project() {
