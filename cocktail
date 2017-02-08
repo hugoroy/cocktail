@@ -9,6 +9,7 @@ end_with_code() {
 
   cleanup_working_folder
   unlock_project
+  verbose "[$FUNCNAME] exiting with RC=[$rc]"
   exit $rc
 }
 
