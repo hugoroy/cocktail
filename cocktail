@@ -256,10 +256,10 @@ tex2pdf() {
   verbose "[$FUNCNAME] input=$input output=$output"
 
   # pdflatex sort avec un code 1 mais genere le PDF on peut pas die sur RC>0 ici
-  RC=$(pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null)
-  verbose "[$FUNCNAME] Passe 1 RC=[$RC]"
-  RC=$(pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null)
-  verbose "[$FUNCNAME] Passe 2 RC=[$RC]"
+  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" > "$WORKING_FOLDER/pdflatex_passe1.log" 2>&1
+  verbose "[$FUNCNAME] Passe 1 RC=[$?]"
+  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" > "$WORKING_FOLDER/pdflatex_passe2.log" 2>&1
+  verbose "[$FUNCNAME] Passe 2 RC=[$?]"
   if test ! -e "$output";
   then
     die "[$FUNCNAME] Génération du PDF '$putput' en erreur"
