@@ -1,9 +1,20 @@
 #!/bin/bash
 
+end_with_code() {
+  local rc=$1
+  if test -z "$rc";
+  then
+    rc=1
+  fi
+
+  cleanup_working_folder
+  unlock_project
+  exit $rc
+}
+
 die() {
   echo -e "$@" >&2
-  release_project
-  exit 1
+  end_with_code 1
 }
 
 verbose() {
@@ -210,13 +221,31 @@ lock_project() {
   touch $LOCK_FILE
 }
 
-release_project() {
+unlock_project() {
   if test -e "$LOCK_FILE";
   then
     verbose "$FUNCNAME lock=$LOCK_FILE exists, delete"
     rm -f "$LOCK_FILE"
   fi
-  verbose "$FUNCNAME $PROJET released"
+  verbose "$FUNCNAME $PROJET unlocked"
+}
+
+cleanup_working_folder() {
+  verbose "$FUNCNAME WORKING_FOLDER=$WORKING_FOLDER"
+  if test -n "$WORKING_FOLDER" -a -d "$WORKING_FOLDER";
+  then
+    if test "$VERBOSE" -eq 1;
+    then
+      rm --recursive --verbose "$WORKING_FOLDER"
+    else
+      rm --recursive "$WORKING_FOLDER"
+    fi
+    if test ! -d "$WORKING_FOLDER";
+    then
+      verbose "$FUNCNAME $WORKING_FOLDER removed"
+    fi
+    # rmdir "$WORKING_FOLDER"
+  fi
 }
 
 usage() {
@@ -242,9 +271,7 @@ publish() {
 
 ### MAIN ###
 base=$( cd $( dirname "${BASH_SOURCE[0]}" ) && pwd )
-
-echo "base=$base"
-if test -e "$base/cocktail.conf";
+if test -r "$base/cocktail.conf";
 then
   source "$base/cocktail.conf"
 else
@@ -329,6 +356,5 @@ pad2markdown "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.markdown.txt
 pad2tex "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.tex"
 tex2pdf "$WORKING_FOLDER/$PROJET.tex" "$WORKING_FOLDER/$PROJET.pdf"
 publish
-release_project
-exit
+end_with_code 0
 
