@@ -145,9 +145,12 @@ pad2docx() {
     --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
     --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh)
   RC=$?
-  if test "$RC" -gt 0;
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
   then
-    die "[$FUNCNAME] RC=[$RC] $RESPONSE"
+    verbose "$errstr"
+  else
+    die "$errstr"
   fi
 }
 
@@ -162,13 +165,21 @@ pad2html() {
   local output=$2
   verbose "[$FUNCNAME] input=$input output=$output"
 
-  pandoc \
+  RESPONSE=$(pandoc \
     -f markdown "$input" \
     -o "$output" -t html --self-contained --smart \
     --filter pandoc-citeproc \
     --filter $PANDOC_FILTER_BASE/html.zsh \
     --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
-    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh
+    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh)
+  RC=$?
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
+  then
+    verbose "$errstr"
+  else
+    die "$errstr"
+  fi
 }
 
 pad2markdown() {
@@ -182,14 +193,22 @@ pad2markdown() {
   local output=$2
   verbose "[$FUNCNAME] input=$input output=$output"
 
-  pandoc \
+  RESPONSE=$(pandoc \
     -f markdown "$input" \
     -o "$output" -t markdown --wrap=none --self-contained --smart \
     --reference-location=block --reference-links \
     --filter pandoc-citeproc \
     --filter $PANDOC_FILTER_BASE/markdown.zsh \
     --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
-    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh
+    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh)
+  RC=$?
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
+  then
+    verbose "$errstr"
+  else
+    die "$errstr"
+  fi
 }
 
 pad2tex() {
@@ -203,7 +222,7 @@ pad2tex() {
   local output=$2
   verbose "[$FUNCNAME] input=$input output=$output"
 
-  pandoc \
+  RESPONSE=$(pandoc \
     -f markdown "$input" \
     -o "$output" -t latex --self-contained \
     --template ../../exegetesDoc/pandocincludes/exegetes.latex \
@@ -211,7 +230,15 @@ pad2tex() {
     --filter $PANDOC_FILTER_BASE/latex.zsh \
     --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
     --filter pandoc-latex-environment \
-    --filter $PANDOC_FILTER_BASE/paranumero.bash
+    --filter $PANDOC_FILTER_BASE/paranumero.bash)
+  RC=$?
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
+  then
+    verbose "$errstr"
+  else
+    die "$errstr"
+  fi
 }
 
 tex2pdf() {
@@ -225,8 +252,24 @@ tex2pdf() {
   local output=$2
   verbose "[$FUNCNAME] input=$input output=$output"
 
-  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null
-  pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null
+  RESPONSE=$(pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null)
+  RC=$?
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
+  then
+    verbose "$errstr"
+  else
+    die "$errstr"
+  fi
+  RESPONSE=$(pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null)
+  RC=$?
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
+  then
+    verbose "$errstr"
+  else
+    die "$errstr"
+  fi
 }
 
 lock_project() {
