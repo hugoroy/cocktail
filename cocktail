@@ -1,9 +1,20 @@
 #!/bin/bash
 
+end_with_code() {
+  local rc=$1
+  if test -z "$rc";
+  then
+    rc=1
+  fi
+
+  cleanup_working_folder
+  unlock_project
+  exit $rc
+}
+
 die() {
   echo -e "$@" >&2
-  unlock_project
-  exit 1
+  end_with_code 1
 }
 
 verbose() {
@@ -337,6 +348,5 @@ pad2markdown "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.markdown.txt
 pad2tex "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.tex"
 tex2pdf "$WORKING_FOLDER/$PROJET.tex" "$WORKING_FOLDER/$PROJET.pdf"
 publish
-unlock_project
-exit
+end_with_code 0
 
