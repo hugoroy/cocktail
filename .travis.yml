@@ -1,7 +1,7 @@
 language: c
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y texlive-latex-base python-pip
+  - sudo apt-get install -y texlive-latex-base texlive-fonts-recommended python-pip
   - wget https://github.com/jgm/pandoc/releases/download/1.19.2.1/pandoc-1.19.2.1-1-amd64.deb
   - sudo dpkg -i *.deb
   - sudo pip install pandoc-latex-environment
