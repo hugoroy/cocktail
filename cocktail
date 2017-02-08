@@ -34,31 +34,31 @@ debug() {
 init_check() {
   if test -e $LOCK_FILE;
   then
-    die "$FUNCNAME lock=$LOCK_FILE exists. Wait compilation or erase it"
+    die "[$FUNCNAME] lock=$LOCK_FILE exists. Wait compilation or erase it"
   fi
 
   # PANDOC_FILTER_BASE should exists
   if test ! -d "$PANDOC_FILTER_BASE";
   then
-    die "$FUNCNAME: PANDOC_FILTER_BASE=$PANDOC_FILTER_BASE unavailable"
+    die "[$FUNCNAME]: PANDOC_FILTER_BASE=$PANDOC_FILTER_BASE unavailable"
   fi
 
   # PANDOC_INCLUDE_BASE should exists
   if test ! -d "$PANDOC_INCLUDE_BASE";
   then
-    die "$FUNCNAME: PANDOC_INCLUDE_BASE=$PANDOC_INCLUDE_BASE unavailable"
+    die "[$FUNCNAME]: PANDOC_INCLUDE_BASE=$PANDOC_INCLUDE_BASE unavailable"
   fi
 
   # STORE should exists
   if test ! -d "$STORE" -o ! -w "$STORE";
   then
-    die "$FUNCNAME: STORE=$STORE should be a writable folder"
+    die "[$FUNCNAME]: STORE=$STORE should be a writable folder"
   fi
 
   # WORKING_FOLDER should exists
   if test ! -d "$WORKING_FOLDER" -o ! -w "$WORKING_FOLDER";
   then
-    die "$FUNCNAME: WORKING_FOLDER=$WORKING_FOLDER should be a writable folder"
+    die "[$FUNCNAME]: WORKING_FOLDER=$WORKING_FOLDER should be a writable folder"
   fi
 
   # external tools
@@ -67,26 +67,26 @@ init_check() {
     local tool_location=$(command -v $tool)
     if test "$tool_location";
     then
-      verbose "init_check() $tool=$tool_location"
+      verbose "[$FUNCNAME] $tool=$tool_location"
     else
-      die "init_check() $tool unavailable"
+      die "[$FUNCNAME] $tool unavailable"
     fi
   done
 }
 
 mirror_pad() {
-  debug "$FUNCNAME ARGS:$@"
+  debug "[$FUNCNAME] ARGS:$@"
   if test $# -ne 2;
   then
-    die 'usage: $FUNCNAME url filename'
+    die 'usage: [$FUNCNAME] url filename'
   fi
 
   local url=$1
   local filename=$2
-  verbose "$FUNCNAME url=$url filename=$filename"
+  verbose "[$FUNCNAME] url=$url filename=$filename"
   RESPONSE=$(curl --silent --show-error $url --output $filename 2>&1)
   RC=$?
-  local errstr="$FUNCNAME url=$url filename$filename [RC:$RC] $RESPONSE"
+  local errstr="[$FUNCNAME] url=$url filename$filename [RC:$RC] $RESPONSE"
   if test "$RC" -gt 0;
   then
     die "$errstr"
@@ -96,15 +96,15 @@ mirror_pad() {
 }
 
 pad2json() {
-  debug "$FUNCNAME ARGS:$@"
+  debug "[$FUNCNAME] ARGS:$@"
   if test $# -ne 2;
   then
-    die "usage: $FUNCNAME input_file output_file"
+    die "usage: [$FUNCNAME] input_file output_file"
   fi
 
   local input=$1
   local output=$2
-  verbose "$FUNCNAME input=$input output=$output"
+  verbose "[$FUNCNAME] input=$input output=$output"
 
   pandoc \
     -f markdown "$input" \
@@ -112,20 +112,20 @@ pad2json() {
 }
 
 pad2docx() {
-  debug "$FUNCNAME PWD:$PWD ARGS:$@"
+  debug "[$FUNCNAME] PWD:$PWD ARGS:$@"
   if test $# -ne 2;
   then
-    die 'usage: $FUNCNAME input_file output_file'
+    die 'usage: [$FUNCNAME] input_file output_file'
   fi
 
   local input=$1
   local output=$2
   local refdoc="$PANDOC_INCLUDE_BASE/exegetes.docx"
-  verbose "$FUNCNAME input=$input output=$output"
+  verbose "[$FUNCNAME] input=$input output=$output"
 
   if ! test -e "$refdoc";
   then
-    die "$FUNCNAME refdoc=$refdoc unavailable"
+    die "[$FUNCNAME] refdoc=$refdoc unavailable"
   fi
 
   pandoc \
@@ -139,15 +139,15 @@ pad2docx() {
 }
 
 pad2html() {
-  debug "$FUNCNAME ARGS:$@"
+  debug "[$FUNCNAME] ARGS:$@"
   if test $# -ne 2;
   then
-    die 'usage: $FUNCNAME input_file output_file'
+    die 'usage: [$FUNCNAME] input_file output_file'
   fi
 
   local input=$1
   local output=$2
-  verbose "$FUNCNAME input=$input output=$output"
+  verbose "[$FUNCNAME] input=$input output=$output"
 
   pandoc \
     -f markdown "$input" \
@@ -159,15 +159,15 @@ pad2html() {
 }
 
 pad2markdown() {
-  debug "$FUNCNAME ARGS:$@"
+  debug "[$FUNCNAME] ARGS:$@"
   if test $# -ne 2;
   then
-    die 'usage: $FUNCNAME input_file output_file'
+    die 'usage: [$FUNCNAME] input_file output_file'
   fi
 
   local input=$1
   local output=$2
-  verbose "$FUNCNAME input=$input output=$output"
+  verbose "[$FUNCNAME] input=$input output=$output"
 
   pandoc \
     -f markdown "$input" \
@@ -180,15 +180,15 @@ pad2markdown() {
 }
 
 pad2tex() {
-  debug "$FUNCNAME ARGS:$@"
+  debug "[$FUNCNAME] ARGS:$@"
   if test $# -ne 2;
   then
-    die 'usage: $FUNCNAME input_file output_file'
+    die 'usage: [$FUNCNAME] input_file output_file'
   fi
 
   local input=$1
   local output=$2
-  verbose "$FUNCNAME input=$input output=$output"
+  verbose "[$FUNCNAME] input=$input output=$output"
 
   pandoc \
     -f markdown "$input" \
@@ -202,42 +202,42 @@ pad2tex() {
 }
 
 tex2pdf() {
-  debug "$FUNCNAME ARGS:$@"
+  debug "[$FUNCNAME] ARGS:$@"
   if test $# -ne 2;
   then
-    die 'usage: $FUNCNAME input_file output_file'
+    die 'usage: [$FUNCNAME] input_file output_file'
   fi
 
   local input=$1
   local output=$2
-  verbose "$FUNCNAME input=$input output=$output"
+  verbose "[$FUNCNAME] input=$input output=$output"
 
   pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null
   pdflatex -interaction=nonstopmode -output-directory="$WORKING_FOLDER" "$input" >/dev/null
 }
 
 lock_project() {
-  verbose "$FUNCNAME $PROJET locked with $LOCK_FILE"
+  verbose "[$FUNCNAME] $PROJET locked with $LOCK_FILE"
   touch $LOCK_FILE
 }
 
 unlock_project() {
   if test -e "$LOCK_FILE";
   then
-    verbose "$FUNCNAME lock=$LOCK_FILE exists, delete"
+    verbose "[$FUNCNAME] lock=$LOCK_FILE exists, delete"
     rm -f "$LOCK_FILE"
     if test ! -e "$LOCK_FILE";
     then
-      verbose "$FUNCNAME $PROJET unlocked, $LOCK_FILE removed."
+      verbose "[$FUNCNAME] $PROJET unlocked, $LOCK_FILE removed."
     else
       # we can'nt call die inside a function called by die
-      verbose "$FUNCNAME we can not unlock $PROJET, $LOCK_FILE still on disk."
+      verbose "[$FUNCNAME] we can not unlock $PROJET, $LOCK_FILE still on disk."
     fi
   fi
 }
 
 cleanup_working_folder() {
-  verbose "$FUNCNAME WORKING_FOLDER=$WORKING_FOLDER"
+  verbose "[$FUNCNAME] WORKING_FOLDER=$WORKING_FOLDER"
   if test -n "$WORKING_FOLDER" -a -d "$WORKING_FOLDER";
   then
     if test "$VERBOSE" -eq 1;
@@ -248,7 +248,7 @@ cleanup_working_folder() {
     fi
     if test ! -d "$WORKING_FOLDER";
     then
-      verbose "$FUNCNAME $WORKING_FOLDER removed"
+      verbose "[$FUNCNAME] $WORKING_FOLDER removed"
     fi
     # rmdir "$WORKING_FOLDER"
   fi
