@@ -232,7 +232,7 @@ unlock_project() {
 
 cleanup_working_folder() {
   verbose "$FUNCNAME WORKING_FOLDER=$WORKING_FOLDER"
-  if test -n "$WORKING_FOLDER" -a test -d "$WORKING_FOLDER";
+  if test -n "$WORKING_FOLDER" -a -d "$WORKING_FOLDER";
   then
     if "$VERBOSE" -eq 1;
     then
