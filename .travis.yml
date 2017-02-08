@@ -10,9 +10,9 @@ before_install:
   - sudo apt-get install -y texlive-latex-extra
   - sudo apt-get install -y python-pip
   - sudo pip install pandoc-latex-environment
-
+notifications:
+  irc: "chat.freenode.net#pressecitron"
 script:
-  - "dpkg -l | grep -e ^ii"
   - ./build.sh
   - ./test_cocktail
 
