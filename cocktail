@@ -234,7 +234,17 @@ cleanup_working_folder() {
   verbose "$FUNCNAME WORKING_FOLDER=$WORKING_FOLDER"
   if test -n "$WORKING_FOLDER" -a test -d "$WORKING_FOLDER";
   then
-    rm -rf "$WORKING_FOLDER/*" && rmdir "$WORKING_FOLDER"
+    if "$VERBOSE" -eq 1;
+    then
+      rm --recursive --verbose "$WORKING_FOLDER"
+    else
+      rm --recursive "$WORKING_FOLDER"
+    fi
+    if test ! -d "$WORKING_FOLDER";
+    then
+      verbose "$FUNCNAME $WORKING_FOLDER removed"
+    fi
+    # rmdir "$WORKING_FOLDER"
   fi
 }
 
