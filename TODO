@@ -3,6 +3,6 @@
 - Meilleure usage()
 - meilleure gestions des logs/erreurs pour donner plus de souplesse à Bartender (partie web)
 - Nettoyer/harmoniser les noms de variables
-- Vérifier le retour de tous les appels à pandoc/padlatex
-
+- Gestion de pads privés
+- Ajouter des tests
 - contraintes : exegetesDoc doit être au même niveau que cocktail à cause des appels relatifs dans les pads.

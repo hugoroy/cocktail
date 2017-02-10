@@ -11,7 +11,6 @@ end_with_code() {
   then
     cleanup_working_folder
   fi
-  unlock_project
   verbose "[$FUNCNAME] exiting with RC=[$rc]"
   exit $rc
 }
@@ -361,7 +360,7 @@ do
     v)
         # Override verbose
         VERBOSE=1
-        verbose "getopts: -$option) PROJET=$PROJET"
+        verbose "getopts: -$option) VERBOSE=$VERBOSE"
         ;;
   esac
 done
@@ -375,7 +374,7 @@ then
 fi
 
 verbose "DOSSIER=$DOSSIER"
-WORKING_FOLDER="$WORKING_FOLDER/$DOSSIER"
+WORKING_FOLDER="$WORKING_FOLDER/$PROJET"
 verbose "WORKING_FOLDER=$WORKING_FOLDER"
 mkdir -p "$WORKING_FOLDER"
 cd "$WORKING_FOLDER" || die "we can't change to \"$WORKING_FOLDER\" folder"
@@ -412,5 +411,6 @@ pad2markdown "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.markdown.txt
 pad2tex "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.tex"
 tex2pdf "$WORKING_FOLDER/$PROJET.tex" "$WORKING_FOLDER/$PROJET.pdf"
 publish
+unlock_project
 end_with_code 0
 
