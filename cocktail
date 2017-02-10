@@ -2,7 +2,7 @@
 
 RC_OK=0
 RC_ERROR=1
-RC_ERROR_LOCKED=2
+RC_ERROR_LOCK=2
 
 end_with_code() {
   local rc=$1
@@ -21,7 +21,7 @@ end_with_code() {
 }
 
 die() {
-  verbose "[FUNCNAME] $@ 1:[$1] 2:[$2]"
+  verbose "[$FUNCNAME] $@ 1:[$1] 2:[$2]"
   local message
   local rc
 
@@ -55,7 +55,7 @@ debug() {
 init_check() {
   if test -e $LOCK_FILE;
   then
-    die "[$FUNCNAME] lock=$LOCK_FILE exists. Wait compilation or erase it" 2
+    die "[$FUNCNAME] lock=$LOCK_FILE exists. Wait compilation or erase it" $RC_ERROR_LOCK
   fi
 
   # PANDOC_FILTER_BASE should exists
@@ -289,7 +289,7 @@ lock_project() {
   then
     echo "$$" > "$LOCK_FILE"
   else
-    die "lockfile $LOCK_FILE already exists"
+    die "lockfile $LOCK_FILE already exists" $RC_ERROR_LOCK
   fi
 }
 
