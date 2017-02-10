@@ -11,7 +11,14 @@ before_install:
   - sudo apt-get install -y python-pip
   - sudo pip install pandoc-latex-environment
 notifications:
-  irc: "chat.freenode.net#pressecitron"
+  irc:
+    channels:
+      - "chat.freenode.net#pressecitron"
+    template:
+      - "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
+      - "Change view : %{compare_url} Build details : %{build_url}"
+      - "%{commit_message}"
+    use_notice: true
 script:
   - ./build.sh
   - ./test_cocktail_01 && ./test_cocktail_02 && ./test_cocktail_03
