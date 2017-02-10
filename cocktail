@@ -11,19 +11,20 @@ end_with_code() {
   then
     cleanup_working_folder
   fi
+
   verbose "[$FUNCNAME] exiting with RC=[$rc]"
   exit $rc
 }
 
 die() {
-  echo -e "$@" >&2
+  echo -e "$$ $@" >&2
   end_with_code 1
 }
 
 verbose() {
   if test "$VERBOSE" -ne 0;
   then
-    echo "$@"
+    echo "$$ $@"
   fi
 }
 
@@ -266,22 +267,35 @@ tex2pdf() {
 }
 
 lock_project() {
-  verbose "[$FUNCNAME] $PROJET locked with $LOCK_FILE"
-  touch $LOCK_FILE
+  verbose "[$FUNCNAME] LOCKFILE=$LOCK_FILE PID=$$ locked"
+  if test ! -e "$LOCK_FILE";
+  then
+    echo "$$" > "$LOCK_FILE"
+  else
+    die "lockfile $LOCK_FILE already exists"
+  fi
 }
 
 unlock_project() {
   if test -e "$LOCK_FILE";
   then
-    verbose "[$FUNCNAME] lock=$LOCK_FILE exists, delete"
-    rm -f "$LOCK_FILE"
-    if test ! -e "$LOCK_FILE";
+    local locker_pid=$(cat "$LOCK_FILE")
+    verbose "[$FUNCNAME] lockfile=$LOCK_FILE lockerpid=$locker_pid pid=$$"
+
+    if test "$locker_pid" -eq "$$";
     then
-      verbose "[$FUNCNAME] $PROJET unlocked, $LOCK_FILE removed."
+      rm -f "$LOCK_FILE"
+
+      if test ! -e "$LOCK_FILE";
+      then
+        verbose "[$FUNCNAME] $PROJET unlocked, $LOCK_FILE removed."
+      else
+        die"[$FUNCNAME] we can not unlock $PROJET, $LOCK_FILE still on disk."
+      fi
     else
-      # we can'nt call die inside a function called by die
-      verbose "[$FUNCNAME] we can not unlock $PROJET, $LOCK_FILE still on disk."
+      die "[$FUNCNAME] we can not delete lockfile owned by another process"
     fi
+
   fi
 }
 
