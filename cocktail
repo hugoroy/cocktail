@@ -1,10 +1,17 @@
 #!/bin/bash
 
+RC_OK=0
+RC_ERROR=1
+RC_LOCK=2
+RC_CONFIG_MISSED=3
+RC_PANDOC_FILES=4
+RC_ARGS=5
+
 end_with_code() {
   local rc=$1
   if test -z "$rc";
   then
-    rc=1
+    rc=$RC_ERROR
   fi
 
   if test "$rc" -eq 0;
@@ -17,8 +24,21 @@ end_with_code() {
 }
 
 die() {
-  echo -e "$$ $@" >&2
-  end_with_code 1
+  verbose "[$FUNCNAME] 1:[$1] 2:[$2]"
+  local message
+  local rc
+
+  if test $# == 2;
+  then
+    message=$1
+    rc=$2
+  else
+    message=$1
+    rc=$RC_ERROR
+  fi
+
+  echo -e "$$ $message" >&2
+  end_with_code $rc
 }
 
 verbose() {
@@ -38,19 +58,19 @@ debug() {
 init_check() {
   if test -e $LOCK_FILE;
   then
-    die "[$FUNCNAME] lock=$LOCK_FILE exists. Wait compilation or erase it"
+    die "[$FUNCNAME] lock=$LOCK_FILE exists. Wait compilation or erase it" $RC_LOCK
   fi
 
   # PANDOC_FILTER_BASE should exists
   if test ! -d "$PANDOC_FILTER_BASE";
   then
-    die "[$FUNCNAME]: PANDOC_FILTER_BASE=$PANDOC_FILTER_BASE unavailable"
+    die "[$FUNCNAME]: PANDOC_FILTER_BASE=$PANDOC_FILTER_BASE unavailable" $RC_PANDOC_FILES
   fi
 
   # PANDOC_INCLUDE_BASE should exists
   if test ! -d "$PANDOC_INCLUDE_BASE";
   then
-    die "[$FUNCNAME]: PANDOC_INCLUDE_BASE=$PANDOC_INCLUDE_BASE unavailable"
+    die "[$FUNCNAME]: PANDOC_INCLUDE_BASE=$PANDOC_INCLUDE_BASE unavailable" $RC_PANDOC_FILES
   fi
 
   # STORE should exists
@@ -272,7 +292,7 @@ lock_project() {
   then
     echo "$$" > "$LOCK_FILE"
   else
-    die "lockfile $LOCK_FILE already exists"
+    die "lockfile $LOCK_FILE already exists" $RC_LOCK
   fi
 }
 
@@ -290,10 +310,10 @@ unlock_project() {
       then
         verbose "[$FUNCNAME] $PROJET unlocked, $LOCK_FILE removed."
       else
-        die"[$FUNCNAME] we can not unlock $PROJET, $LOCK_FILE still on disk."
+        die"[$FUNCNAME] we can not unlock $PROJET, $LOCK_FILE still on disk." $RC_LOCK
       fi
     else
-      die "[$FUNCNAME] we can not delete lockfile owned by another process"
+      die "[$FUNCNAME] we can not delete lockfile owned by another process" $RC_LOCK
     fi
 
   fi
@@ -313,7 +333,6 @@ cleanup_working_folder() {
     then
       verbose "[$FUNCNAME] $WORKING_FOLDER removed"
     fi
-    # rmdir "$WORKING_FOLDER"
   fi
 }
 
@@ -325,7 +344,15 @@ usage() {
       -g : url du pad de page de garde (optionnel)
       -h : cette page d'aide
       -p : nom du projet
-      -v : force le mode verbeux"
+      -v : force le mode verbeux
+
+    return codes:
+      0 : OK
+      1 : GENERIC ERROR
+      2 : LOCK ERROR
+      3 : CONFIG FILE IS MISSING
+      4 : PANDOC FILTER IS MISSING OR NOT EXECUTABLE
+      5 : ARGUMENTS ERRORS"
 }
 
 publish() {
@@ -344,7 +371,7 @@ if test -r "$base/cocktail.conf";
 then
   source "$base/cocktail.conf"
 else
-  die "cocktail.conf is missing, see config.conf.smp for example"
+  die "cocktail.conf is missing, see config.conf.smp for example" $RC_CONFIG_MISSED
 fi
 
 OPTERR=1
@@ -384,7 +411,7 @@ verbose "ARGS=$@"
 
 if test -z "$DOSSIER";
 then
-  die "getopts: -d DOSSIER is mandatory"
+  die "getopts: -d DOSSIER is mandatory" $RC_ARGS
 fi
 
 verbose "DOSSIER=$DOSSIER"
@@ -402,7 +429,7 @@ verbose "LOCK_FILE=$LOCK_FILE"
 
 if test -z "$URL_BASE";
 then
-  die "getopts: -b URL_BASE is mandatory"
+  die "getopts: -b URL_BASE is mandatory" $RC_ARGS
 fi
 
 init_check
@@ -426,5 +453,5 @@ pad2tex "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.tex"
 tex2pdf "$WORKING_FOLDER/$PROJET.tex" "$WORKING_FOLDER/$PROJET.pdf"
 publish
 unlock_project
-end_with_code 0
+end_with_code $RC_OK
 
