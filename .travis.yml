@@ -18,6 +18,7 @@ notifications:
       - "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
       - "Change view : %{compare_url} Build details : %{build_url}"
       - "%{commit_message"
+    use_notice: true
 script:
   - ./build.sh
   - ./test_cocktail_01 && ./test_cocktail_02 && ./test_cocktail_03
