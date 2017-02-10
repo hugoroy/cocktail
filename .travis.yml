@@ -14,5 +14,5 @@ notifications:
   irc: "chat.freenode.net#pressecitron"
 script:
   - ./build.sh
-  - ./test_cocktail
+  - ./test_cocktail_01 && ./test_cocktail_02 && ./test_cocktail_03
 
