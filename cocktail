@@ -21,14 +21,18 @@ end_with_code() {
 }
 
 die() {
-  local message=shift 1
+  local message
   local rc
-  if test $# -eq 1;
+
+  if test $# == 2;
   then
-    rc=shift 1
+    message=$1
+    rc=$2
   else
+    message=$1
     rc=$RC_ERROR
   fi
+
   echo -e "$$ $message" >&2
   end_with_code $rc
 }
