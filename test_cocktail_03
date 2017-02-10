@@ -1,0 +1,70 @@
+#!/bin/bash
+
+echo "Test 03: 2 compilations dans le même dossier, même projet."
+echo "Un des deux doit tomber en erreur"
+
+RC1=99
+RC2=99
+
+handle_child() {
+  local tmp=()
+  for((i=0;i<${#pids[@]};++i));
+  do
+    if test ! -d /proc/${pids[i]};
+    then
+      wait ${pids[i]}
+      RC0=$?
+      echo "Stopped ${pids[i]}; exit code: $RC0"
+      if test "$RC1" -eq 99;
+      then
+        RC1="$RC0"
+      else
+        if test "$RC2" -eq 99;
+        then
+          RC2="$RC0"
+        fi
+      fi
+    else
+      tmp+=(${pids[i]})
+    fi
+  done
+  pids=(${tmp[@]})
+}
+
+set -o monitor
+trap "handle_child" CHLD
+
+
+# Start background processes
+./cocktail -v -d MonDossier -p Abro2 -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt' &
+pids+=($!)
+
+./cocktail -v -d MonDossier -p Abro2 -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt' &
+pids+=($!)
+
+# Wait until all background processes are stopped
+while [ ${#pids[@]} -gt 0 ];
+do
+  echo "WAITING FOR: ${pids[@]}";
+  sleep 2;
+done
+echo STOPPED
+echo "RC1=$RC1 RC2=$RC2"
+
+# cocktail exits with rc 2 if error lock
+if test "$RC1" -eq 0 -a "$RC2" -eq 2;
+then
+  echo "Test réussi"
+  exit 0
+fi
+
+# cocktail exits with rc 2 if error lock
+if test "$RC2" -eq 0 -a "$RC1" -eq 2;
+then
+  echo "Test réussi"
+  exit 0
+fi
+
+echo "Test échoué"
+exit 1
+
