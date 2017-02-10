@@ -1,8 +1,5 @@
 - Recevoir plusieurs URL de pad de base (-b) pour les traiter par lots
-
-- Meilleure usage()
 - meilleure gestions des logs/erreurs pour donner plus de souplesse à Bartender (partie web)
 - Nettoyer/harmoniser les noms de variables
 - Gestion de pads privés
-- Ajouter des tests
 - contraintes : exegetesDoc doit être au même niveau que cocktail à cause des appels relatifs dans les pads.

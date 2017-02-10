@@ -337,8 +337,8 @@ cleanup_working_folder() {
 }
 
 usage() {
-  
-  echo "cocktail -b url_base -d dossier [ -h ] -p projet [ -g url_garde ]
+  echo "
+  cocktail -b url_base -d dossier [ -h ] -p projet [ -g url_garde ] [ -v ]
       -b : url du pad principal
       -d : nom du dossier
       -g : url du pad de page de garde (optionnel)
@@ -356,13 +356,26 @@ usage() {
 }
 
 publish() {
-    for ext in pdf docx html txt
-    do
-      local from="$WORKING_FOLDER/$PROJET.$ext"
-      local to="$STORE/$PROJET.$ext"
-      verbose "$from -> $to"
-      cp -f "$from" "$to"
-    done
+  local src_folder="$1"
+  local dst_folder="$2"
+  verbose "[$FUNCNAME] SOURCE=$src_folder DESTINATION=$dst_folder"
+  if test ! -d "$src_folder";
+  then
+    die "[$FUNCNAME] the folder '$src_folder' does not exists"
+  fi
+
+  if test ! -d "$dst_folder";
+  then
+    die "[$FUNCNAME] the folder '$dst_folder' does not exists"
+  fi
+
+  for ext in pdf docx html txt
+  do
+    local from="$src_folder/$PROJET.$ext"
+    local to="$dst_folder/$PROJET.$ext"
+    verbose "$from -> $to"
+    cp -f "$from" "$to"
+  done
 }
 
 ### MAIN ###
@@ -451,7 +464,7 @@ pad2html "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.html"
 pad2markdown "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.markdown.txt"
 pad2tex "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.tex"
 tex2pdf "$WORKING_FOLDER/$PROJET.tex" "$WORKING_FOLDER/$PROJET.pdf"
-publish
+publish "$WORKING_FOLDER" "$STORE"
 unlock_project
 end_with_code $RC_OK
 
