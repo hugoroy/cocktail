@@ -21,11 +21,11 @@ end_with_code() {
 }
 
 die() {
-  local message=shift
+  local message=shift 1
   local rc
   if test $# -eq 1;
   then
-    rc=shift
+    rc=shift 1
   else
     rc=$RC_ERROR
   fi
