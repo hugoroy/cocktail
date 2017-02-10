@@ -1,10 +1,14 @@
 #!/bin/bash
 
+RC_OK=0
+RC_ERROR=1
+RC_ERROR_LOCKED=2
+
 end_with_code() {
   local rc=$1
   if test -z "$rc";
   then
-    rc=1
+    rc=$RC_ERROR
   fi
 
   if test "$rc" -eq 0;
@@ -17,8 +21,16 @@ end_with_code() {
 }
 
 die() {
-  echo -e "$$ $@" >&2
-  end_with_code 1
+  local message=shift
+  local rc
+  if test $# -eq 1;
+  then
+    rc=shift
+  else
+    rc=$RC_ERROR
+  fi
+  echo -e "$$ $message" >&2
+  end_with_code $rc
 }
 
 verbose() {
@@ -38,7 +50,7 @@ debug() {
 init_check() {
   if test -e $LOCK_FILE;
   then
-    die "[$FUNCNAME] lock=$LOCK_FILE exists. Wait compilation or erase it"
+    die "[$FUNCNAME] lock=$LOCK_FILE exists. Wait compilation or erase it" 2
   fi
 
   # PANDOC_FILTER_BASE should exists
