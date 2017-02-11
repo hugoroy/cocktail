@@ -98,6 +98,23 @@ init_check() {
   done
 }
 
+urlencode() {
+  local url=$1
+  local strlen=${#url}
+  local encoded=""
+  local pos c o
+
+  for (( pos=0 ; pos<strlen ; pos++ )); do
+     c=${url:$pos:1}
+     case "$c" in
+        [-_.~a-zA-Z0-9] ) o="${c}" ;;
+        * )               printf -v o '%%%02x' "'$c"
+     esac
+     url_encoded+="${o}"
+  done
+  echo "$url_encoded"
+}
+
 mirror_pad() {
   debug "[$FUNCNAME] ARGS:$@"
   if test $# -ne 2;
@@ -105,10 +122,10 @@ mirror_pad() {
     die 'usage: [$FUNCNAME] url filename'
   fi
 
-  local url=$1
+  local url=$(urlencode "$1")
   local filename=$2
   verbose "[$FUNCNAME] url=$url filename=$filename"
-  RESPONSE=$(perl $base/mirror_pad.pl "$url" > "$filename")
+  RESPONSE=$(perl $base/mirror_pad.pl $url > "$filename")
   RC=$?
   local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
   if test "$RC" -eq 0;

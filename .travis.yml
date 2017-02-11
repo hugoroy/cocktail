@@ -16,6 +16,7 @@ before_install:
   - sudo apt-get install -y texlive-latex-extra
   - sudo apt-get install -y python-pip
   - sudo pip install pandoc-latex-environment
+  - cpanm Etherpad Config::YAML URI::Encode
 notifications:
   irc:
     channels:
