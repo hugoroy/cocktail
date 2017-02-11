@@ -108,7 +108,7 @@ mirror_pad() {
   local url=$1
   local filename=$2
   verbose "[$FUNCNAME] url=$url filename=$filename"
-  RESPONSE=$(curl --silent --show-error $url --output $filename 2>&1)
+  RESPONSE=$(perl $base/mirror_pad.pl "$url" > "$filename")
   RC=$?
   local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
   if test "$RC" -eq 0;
