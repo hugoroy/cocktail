@@ -18,7 +18,7 @@ my $ep = Etherpad->new(
 
 my $pad_base = quotemeta $c->get_url;
 my $pad_id = $url;
-$pad_id =~ s{$pad_base/?.+?/(g\..+?\$.+)(?:/export/.+)?}{$1};
+$pad_id =~ s{$pad_base/?.+?/(g\.[^$]+\$[^/].+)}{$1};
 my $pad_text = Encode::encode('UTF-8', $ep->get_text($pad_id) );
 print $pad_text;
 
