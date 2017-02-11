@@ -1,2 +1,7 @@
 #!/bin/bash
-./cocktail -v -d MonDossier -p Abro2 -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt'
+./cocktail -v -d MonDossier -p Abro2 \
+           -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' \
+           -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt' && \
+./cocktail -v -d privacyshield -p PrivShield-DRI \
+           -b 'https://pad.exegetes.eu.org/p/g.LOe9KTSEtDDWQW3v-DRI-Interv-Garde/export/txt' \
+           -g 'https://pad.exegetes.eu.org/p/g.LOe9KTSEtDDWQW3v-DRI-Intervention/export/txt'
