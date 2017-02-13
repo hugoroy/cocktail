@@ -28,7 +28,7 @@ die() {
   local message
   local rc
 
-  if test $# == 2;
+  if test $# -eq 2;
   then
     message=$1
     rc=$2
@@ -126,7 +126,7 @@ mirror_pad() {
   local filename=$2
   verbose "[$FUNCNAME] url=$url filename=$filename"
 
-  if test "$TRAVIS" -eq "true";
+  if test "$TRAVIS" = "true";
   then
     # test only public pads with curl if building in travis
     RESPONSE=$(curl --silent --show-error $url --output $filename 2>&1)
