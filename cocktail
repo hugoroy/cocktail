@@ -122,11 +122,22 @@ mirror_pad() {
     die 'usage: [$FUNCNAME] url filename'
   fi
 
-  local url=$(urlencode "$1")
+  local url=$1
   local filename=$2
   verbose "[$FUNCNAME] url=$url filename=$filename"
-  RESPONSE=$(perl $base/mirror_pad.pl $url > "$filename")
-  RC=$?
+
+  if test "$TRAVIS" -eq "true";
+  then
+    # test only public pads with curl if building in travis
+    RESPONSE=$(curl --silent --show-error $url --output $filename 2>&1)
+    RC=$?
+  else
+    url=$(urlencode "$1")
+    verbose "[$FUNCNAME] urlencoded=$url filename=$filename"
+    RESPONSE=$(perl $base/mirror_pad.pl $url > "$filename")
+    RC=$?
+  fi
+
   local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
   if test "$RC" -eq 0;
   then
