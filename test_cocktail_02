@@ -1,11 +1,10 @@
 #!/bin/bash
 
-echo "Test 02: 2 compilations dans le même dossier, projets différents."
-echo "Les deux compilations doivent réussir"
+echo "Test 02: 2 compilations dans le même dossier, projets différents"
+echo "Les deux doivent correctement se dérouler"
 
-RC1=99
-RC2=99
-
+# pids conserve la liste des pids
+# retcode conserve le code retour de chaque pid une fois terminé
 handle_child() {
   local tmp=()
   for((i=0;i<${#pids[@]};++i));
@@ -13,17 +12,7 @@ handle_child() {
     if test ! -d /proc/${pids[i]};
     then
       wait ${pids[i]}
-      RC0=$?
-      echo "Stopped ${pids[i]}; exit code: $RC0"
-      if test "$RC1" -eq 99;
-      then
-        RC1="$RC0"
-      else
-        if test "$RC2" -eq 99;
-        then
-          RC2="$RC0"
-        fi
-      fi
+      retcode[${pids[i]}]=$?
     else
       tmp+=(${pids[i]})
     fi
@@ -36,10 +25,18 @@ trap "handle_child" CHLD
 
 
 # Start background processes
-./cocktail -v -d MonDossier -p Abro2 -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt' &
+./cocktail -v \
+           -d MonDossier \
+           -p Abro2 \
+           -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' \
+           -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt' &
 pids+=($!)
 
-./cocktail -v -d MonDossier -p Abro3 -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt' &
+./cocktail -v \
+           -d MonDossier \
+           -p Abro3 \
+           -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' \
+           -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt' &
 pids+=($!)
 
 # Wait until all background processes are stopped
@@ -49,14 +46,23 @@ do
   sleep 2;
 done
 echo STOPPED
-echo "RC1=$RC1 RC2=$RC2"
 
-if test "$RC1" -eq 0 -a "$RC2" -eq 0;
+# affichage des code retour et generation de la chaine de test
+for pid in "${!retcode[@]}"
+do
+  statusstring="$statusstring $pid=${retcode[$pid]}"
+  retcodestr="${retcodestr}${retcode[$pid]}"
+done
+echo $statusstring
+
+if test $retcodestr -eq "00" -o $retcodestr -eq "00";
 then
   echo "Test réussi"
+  echo "Les deux processus se sont terminés en code 0"
   exit 0
+else
+  echo "Test échoué."
+  echo "Les deux processus doivent se terminer en code 0"
+  exit 1
 fi
-
-echo "Test échoué"
-exit 1
 
