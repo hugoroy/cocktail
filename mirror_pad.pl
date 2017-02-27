@@ -13,8 +13,6 @@ my $c = Config::YAML->new(config => "$FindBin::Bin/mirror_pad.yml");
 my $ep = Etherpad->new(
   url      => $c->get_url,
   apikey   => $c->get_apikey,
-  user     => $c->get_user,
-  password => $c->get_password,
 );
 
 my $pad_base = quotemeta $c->get_url;

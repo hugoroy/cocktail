@@ -6,5 +6,5 @@ curl -L https://cpanmin.us | perl - App::cpanminus
 ~/perl5/bin/cpanm --local-lib=~/perl5 local::lib
 perl -I ~/perl5/lib/perl5/ -Mlocal::lib >> .bashrc
 source .bashrc
-~/perl5/bin/cpanm URI::Encode Etherpad Config::YAML
+~/perl5/bin/cpanm URI::Encode Etherpad Config::YAML IO::Socket::SSL
 
