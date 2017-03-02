@@ -28,15 +28,15 @@ trap "handle_child" CHLD
 ./cocktail -v \
            -d MonDossier \
            -p Abro2 \
-           -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' \
-           -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt' &
+           -b 'https%3A%2F%2Fpad.exegetes.eu.org%2Fp%2Fg.DSXI1kGFT1gjor66%24Abro-REP-Tele2-Principal%2Fexport%2Ftxt' \
+           -g 'https%3A%2F%2Fpad.exegetes.eu.org%2Fp%2Fg.DSXI1kGFT1gjor66%24Abro-REP-Tele2-Garde%2Fexport%2Ftxt' &
 pids+=($!)
 
 ./cocktail -v \
            -d MonDossier \
            -p Abro2 \
-           -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' \
-           -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt' &
+           -b 'https%3A%2F%2Fpad.exegetes.eu.org%2Fp%2Fg.DSXI1kGFT1gjor66%24Abro-REP-Tele2-Principal%2Fexport%2Ftxt' \
+           -g 'https%3A%2F%2Fpad.exegetes.eu.org%2Fp%2Fg.DSXI1kGFT1gjor66%24Abro-REP-Tele2-Garde%2Fexport%2Ftxt' &
 pids+=($!)
 
 # Wait until all background processes are stopped
