@@ -98,23 +98,6 @@ init_check() {
   done
 }
 
-urlencode() {
-  local url=$1
-  local strlen=${#url}
-  local encoded=""
-  local pos c o
-
-  for (( pos=0 ; pos<strlen ; pos++ )); do
-     c=${url:$pos:1}
-     case "$c" in
-        [-_.~a-zA-Z0-9] ) o="${c}" ;;
-        * )               printf -v o '%%%02x' "'$c"
-     esac
-     url_encoded+="${o}"
-  done
-  echo "$url_encoded"
-}
-
 mirror_pad() {
   debug "[$FUNCNAME] ARGS:$@"
   if test $# -ne 2;
@@ -128,12 +111,10 @@ mirror_pad() {
 
   if test "$TRAVIS" = "true";
   then
-    # test only public pads with curl if building in travis
+    # test only public pads (with curl) if building in travis
     RESPONSE=$(curl --silent --show-error $url --output $filename 2>&1)
     RC=$?
   else
-    url=$(urlencode "$1")
-    verbose "[$FUNCNAME] urlencoded=$url filename=$filename"
     RESPONSE=$(perl $base/mirror_pad.pl $url > "$filename")
     RC=$?
   fi
