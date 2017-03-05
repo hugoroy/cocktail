@@ -3,9 +3,24 @@
 echo "Test 03: 2 compilations dans le même dossier, même projet."
 echo "Un des deux doit tomber en erreur"
 
-RC1=99
-RC2=99
+if test "$TRAVIS" = "true";
+then
+  URL_FILE=url_test.pub.txt
+else
+  URL_FILE=url_test.priv.txt
+fi
 
+if test -r "$URL_FILE";
+then
+  URL_BASE=$(head -n1 "$URL_FILE")
+  URL_GARDE=$(tail -n1 "$URL_FILE")
+else
+  echo "'$URL_FILE' introuvable"
+  exit 1
+fi
+
+# pids conserve la liste des pids
+# retcode conserve le code retour de chaque pid une fois terminé
 handle_child() {
   local tmp=()
   for((i=0;i<${#pids[@]};++i));
@@ -13,17 +28,7 @@ handle_child() {
     if test ! -d /proc/${pids[i]};
     then
       wait ${pids[i]}
-      RC0=$?
-      echo "Stopped ${pids[i]}; exit code: $RC0"
-      if test "$RC1" -eq 99;
-      then
-        RC1="$RC0"
-      else
-        if test "$RC2" -eq 99;
-        then
-          RC2="$RC0"
-        fi
-      fi
+      retcode[${pids[i]}]=$?
     else
       tmp+=(${pids[i]})
     fi
@@ -36,10 +41,18 @@ trap "handle_child" CHLD
 
 
 # Start background processes
-./cocktail -v -d MonDossier -p Abro2 -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt' &
+./cocktail -v \
+           -d MonDossier \
+           -p Abro2 \
+           -b "$URL_BASE" \
+           -g "$URL_GARDE" &
 pids+=($!)
 
-./cocktail -v -d MonDossier -p Abro2 -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt' &
+./cocktail -v \
+           -d MonDossier \
+           -p Abro2 \
+           -b "$URL_BASE" \
+           -g "$URL_GARDE" &
 pids+=($!)
 
 # Wait until all background processes are stopped
@@ -49,22 +62,23 @@ do
   sleep 2;
 done
 echo STOPPED
-echo "RC1=$RC1 RC2=$RC2"
 
-# cocktail exits with rc 2 if error lock
-if test "$RC1" -eq 0 -a "$RC2" -eq 2;
+# affichage des code retour et generation de la chaine de test
+for pid in "${!retcode[@]}"
+do
+  statusstring="$statusstring $pid=${retcode[$pid]}"
+  retcodestr="${retcodestr}${retcode[$pid]}"
+done
+echo $statusstring
+
+if test $retcodestr -eq "02" -o $retcodestr -eq "20";
 then
   echo "Test réussi"
+  echo "Un des 2 processus s'est terminé en code 0 et l'autre en code 2"
   exit 0
+else
+  echo "Test échoué."
+  echo "Un des 2 processus doit se terminer en code 0 et l'autre en code 2"
+  exit 1
 fi
-
-# cocktail exits with rc 2 if error lock
-if test "$RC2" -eq 0 -a "$RC1" -eq 2;
-then
-  echo "Test réussi"
-  exit 0
-fi
-
-echo "Test échoué"
-exit 1
 

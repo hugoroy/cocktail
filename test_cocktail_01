@@ -1,7 +1,24 @@
 #!/bin/bash
-./cocktail -v -d MonDossier -p Abro2 \
-           -b 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Principal/export/txt' \
-           -g 'https://pad.exegetes.eu.org/p/g.DSXI1kGFT1gjor66$Abro-REP-Tele2-Garde/export/txt' && \
-./cocktail -v -d privacyshield -p PrivShield-DRI \
-           -b 'https://pad.exegetes.eu.org/p/g.LOe9KTSEtDDWQW3v-DRI-Interv-Garde/export/txt' \
-           -g 'https://pad.exegetes.eu.org/p/g.LOe9KTSEtDDWQW3v-DRI-Intervention/export/txt'
+
+if test "$TRAVIS" = "true";
+then
+  URL_FILE=url_test.pub.txt
+else
+  URL_FILE=url_test.priv.txt
+fi
+
+if test -r "$URL_FILE";
+then
+  URL_BASE=$(head -n1 "$URL_FILE")
+  URL_GARDE=$(tail -n1 "$URL_FILE")
+else
+  echo "'$URL_FILE' introuvable"
+  exit 1
+fi
+
+./cocktail -v \
+           -d MonDossier \
+           -p Abro2 \
+           -b "$URL_BASE" \
+           -g "$URL_GARDE"
+
