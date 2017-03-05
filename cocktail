@@ -90,7 +90,7 @@ init_check() {
   fi
 
   # external tools
-  for tool in touch curl pandoc pdflatex
+  for tool in touch pandoc pdflatex
   do
     local tool_location=$(command -v $tool)
     if test "$tool_location";
