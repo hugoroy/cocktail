@@ -1,3 +1,4 @@
 #!/bin/bash
-./test_cocktail_01 && ./test_cocktail_02 && ./test_cocktail03
+./test_cocktail_01 && ./test_cocktail_02 && ./test_cocktail_03 && echo [ALL TESTS OK] && exit 0
+echo [FAILED] && exit 1
 

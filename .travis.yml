@@ -23,5 +23,5 @@ notifications:
       - "%{commit_message}"
     use_notice: true
 script:
-  - ./test_cocktail_01 && ./test_cocktail_02 && ./test_cocktail_03
+  - ./alltests
 
