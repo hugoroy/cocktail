@@ -1,2 +1,6 @@
 *.conf
 url_test.priv.txt
+mirror_pad.yml
+uridecode
+uriencode
+list_pads.pl
