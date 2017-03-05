@@ -4,8 +4,9 @@ RC_OK=0
 RC_ERROR=1
 RC_LOCK=2
 RC_CONFIG_MISSED=3
-RC_PANDOC_FILES=4
-RC_ARGS=5
+RC_CONFIG_PARAM=4
+RC_PANDOC_FILES=5
+RC_ARGS=6
 
 end_with_code() {
   local rc=$1
@@ -42,9 +43,12 @@ die() {
 }
 
 verbose() {
-  if test "$VERBOSE" -ne 0;
+  if test -n "$VERBOSE";
   then
-    echo "$$ $@"
+    if test "$VERBOSE" -ne 0;
+    then
+      echo "$$ $@"
+    fi
   fi
 }
 
@@ -392,6 +396,30 @@ base=$( cd $( dirname "${BASH_SOURCE[0]}" ) && pwd )
 if test -r "$base/cocktail.conf";
 then
   source "$base/cocktail.conf"
+  error_in_config=0
+  # Should be in config file
+  if test -z "$PANDOC_FILTER_BASE";
+  then
+    echo "$$ PANDOC_FILTER_BASE not found in config file"
+    error_in_config=1
+  fi
+  if test -z "$PANDOC_INCLUDE_BASE";
+  then
+    echo "$$ PANDOC_INCLUDE_BASE not found in config file"
+    error_in_config=1
+  fi
+  if test -z "$WORKING_FOLDER";
+  then
+    echo "$$ WORKING_FOLDER not found in config file"
+  fi
+  if test -z "$STORE";
+  then
+    echo "$$ STORE not found in config file"
+  fi
+  if test "$error_in_config" -eq 1;
+  then
+    die "Errors in config file, maybee empty ?" $RC_CONFIG_PARAM
+  fi
 else
   die "cocktail.conf is missing, see config.conf.smp for example" $RC_CONFIG_MISSED
 fi
