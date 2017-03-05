@@ -15,12 +15,14 @@ my $config_file = "$FindBin::Bin/mirror_pad.yml";
 die "'$config_file' introuvable\n" unless -r $config_file;
 
 my $c = Config::YAML->new(config => $config_file);
+my $apikey = $c->get_apikey or die "apikey in config file ?";
+my $apiurl = $c->get_apiurl or die "apiurl in config file ?";
 my $ep = Etherpad->new(
-  apiurl => $c->get_apiurl,
-  apikey => $c->get_apikey,
+  url    => $apiurl,
+  apikey => $apikey,
 );
 
-my $pad_base = quotemeta $c->get_apiurl;
+my $pad_base = quotemeta $apiurl;
 warn "PAD_BASE=$pad_base";
 # Extraction de l'id du pad à partir de l'url du pad
 my $pad_id;
