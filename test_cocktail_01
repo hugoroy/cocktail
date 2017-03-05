@@ -1,1 +1,7 @@
 #!/bin/bash
+./cocktail -v \
+           -d MonDossier \
+           -p Abro2 \
+           -b 'https%3A%2F%2Fpad.exegetes.eu.org%2Fp%2Fg.DSXI1kGFT1gjor66%24Abro-REP-Tele2-Principal%2Fexport%2Ftxt' \
+           -g 'https%3A%2F%2Fpad.exegetes.eu.org%2Fp%2Fg.DSXI1kGFT1gjor66%24Abro-REP-Tele2-Garde%2Fexport%2Ftxt'
+
