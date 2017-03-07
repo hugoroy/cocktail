@@ -7,4 +7,4 @@ WORKING_FOLDER=$HOME/tmp
 
 STORE=$HOME/store
 
-MIRRORPAD=$HOME/mirrorpad/mirrorpad.pl
+MIRRORPAD=$HOME/mirrorpad/mirrorpad
