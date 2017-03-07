@@ -200,7 +200,8 @@ pad2html() {
     --filter pandoc-citeproc \
     --filter $PANDOC_FILTER_BASE/html.zsh \
     --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
-    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh)
+    --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh \
+    --metadata header-includes="<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
   RC=$?
   local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
   if test "$RC" -eq 0;
