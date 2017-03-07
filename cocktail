@@ -89,6 +89,12 @@ init_check() {
     die "[$FUNCNAME]: WORKING_FOLDER=$WORKING_FOLDER should be a writable folder"
   fi
 
+  # MIRRORPAD shoud exists and executable
+  if test ! -x "$MIRRORPAD";
+  then
+    die "[$FUNCNAME]: MIRRORPAD=$MIRRORPAD should be an axecutable file"
+  fi
+
   # external tools
   for tool in touch pandoc pdflatex
   do
@@ -113,7 +119,7 @@ mirror_pad() {
   local filename=$2
   verbose "[$FUNCNAME] url=$url filename=$filename"
 
-  RESPONSE=$(perl $base/mirror_pad.pl $url > "$filename")
+  RESPONSE=$($MIRRORPAD $url > "$filename")
   RC=$?
 
   local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
@@ -410,6 +416,11 @@ then
   then
     echo "$$ STORE not found in config file"
   fi
+  if test -z "$MIRRORPAD";
+  then
+    echo "$$ MIRRORPAD not found in config file"
+  fi
+
   if test "$error_in_config" -eq 1;
   then
     die "Errors in config file, maybee empty ?" $RC_CONFIG_PARAM
