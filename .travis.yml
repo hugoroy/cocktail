@@ -12,7 +12,7 @@ before_install:
   - sudo apt-get install -y texlive-latex-base texlive-font-utils texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra
   - sudo apt-get install -y python-pip
   - sudo pip install pandoc-latex-environment
-  - ./build.sh
+  - sudo ./build.sh
 notifications:
   irc:
     channels:
