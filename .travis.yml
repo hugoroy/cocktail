@@ -23,6 +23,7 @@ notifications:
       - "Change view : %{compare_url} Build details : %{build_url}"
       - "%{commit_message}"
     use_notice: true
+install: true
 script:
   - t/alltests
 
