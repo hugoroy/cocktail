@@ -8,6 +8,7 @@ RC_CONFIG_PARAM=4
 RC_PANDOC_FILES=5
 RC_ARGS=6
 RC_ARGS_DOSSIER=7
+RC_ARGS_PROJET=8
 
 end_with_code() {
   local rc=$1
@@ -474,6 +475,12 @@ verbose "DOSSIER=$DOSSIER"
 if [[ ! $DOSSIER =~ ^[a-zA-Z0-9_-]+$ ]];
 then
   die "DOSSIER ne peut contenir que des chiffres, des lettres, - ou _" $RC_ARGS_DOSSIER
+fi
+
+verbose "PROJET:$PROJET"
+if [[ ! $PROJET =~ ^[a-zA-Z0-9_-]+$ ]];
+then
+  die "PROJET ne peut contenir que des chiffres, des lettres, - ou _" $RC_ARGS_PROJET
 fi
 
 WORKING_FOLDER="$WORKING_FOLDER/$PROJET"
