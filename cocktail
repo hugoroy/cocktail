@@ -470,6 +470,11 @@ then
 fi
 
 verbose "DOSSIER=$DOSSIER"
+if [[ ! $DOSSIER =~ ^[a-zA-Z0-9_-]+$ ]];
+then
+  die "DOSSIER ne peut contenir que des chiffres, des lettres, - ou _" $RC_ARGS
+fi
+
 WORKING_FOLDER="$WORKING_FOLDER/$PROJET"
 verbose "WORKING_FOLDER=$WORKING_FOLDER"
 mkdir -p "$WORKING_FOLDER"
