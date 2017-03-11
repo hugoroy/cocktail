@@ -23,5 +23,5 @@ notifications:
       - "%{commit_message}"
     use_notice: true
 script:
-  - ./alltests
+  - t/alltests
 
