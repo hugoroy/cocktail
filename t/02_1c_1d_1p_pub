@@ -1,0 +1,27 @@
+#!/bin/bash
+
+printf "$PRINTFPATTERN" $0 : "1 Compilation. 1 Dossier. 1 Projet. Pad Public."
+
+URL_BASE=https%3A%2F%2Fpad.exegetes.eu.org%2Fp%2Fg.DSXI1kGFT1gjor66%24Abro-REP-Tele2-Principal
+URL_GARDE=https%3A%2F%2Fpad.exegetes.eu.org%2Fp%2Fg.DSXI1kGFT1gjor66%24Abro-REP-Tele2-Garde
+DOSSIER=MonDossier$$
+PROJET=Abro2$$
+
+OUTPUT=$(./cocktail -v \
+           -d "$DOSSIER" \
+           -p "$PROJET" \
+           -b "$URL_BASE" \
+           -g "$URL_GARDE" 2>&1 >/dev/null) 
+RC=$?
+echo -n "RC=$RC "
+if test "$RC" -ne "0";
+then
+  # Test raté
+  echo "[FAILED]"
+else
+  echo "[  OK  ]"
+fi
+echo "$OUTPUT"
+
+exit "$RC"
+

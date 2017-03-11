@@ -1,0 +1,33 @@
+#!/bin/bash
+
+printf "$PRINTFPATTERN" $0 : "1 Compilation. 1 Dossier. 1 Projet. Pad Privé. export/txt"
+
+if test "$TRAVIS" == "true";
+then
+  echo "[ SKIP ]"
+  exit 0
+fi
+
+URL_BASE=https%3A%2F%2Fpad.exegetes.eu.org%2Fgroup.html%2F19%2Fpad.html%2Fg.STVKtWnA83RsmVUC%24Abro2-PRIVE%2Fexport%2Ftxt
+URL_GARDE=https%3A%2F%2Fpad.exegetes.eu.org%2Fgroup.html%2F19%2Fpad.html%2Fg.STVKtWnA83RsmVUC%24Abro2Garde-PRIVE%2Fexport%2Ftxt
+DOSSIER=MonDossier$$
+PROJET=Abro$$
+
+OUTPUT=$(./cocktail -v \
+           -d "$DOSSIER" \
+           -p "$PROJET" \
+           -b "$URL_BASE" \
+           -g "$URL_GARDE" 2>&1 >/dev/null) 
+RC=$?
+echo -n "RC=$RC "
+if test "$RC" -ne "0";
+then
+  # Test raté
+  echo "[FAILED]"
+else
+  echo "[  OK  ]"
+fi
+echo "$OUTPUT"
+
+exit "$RC"
+
