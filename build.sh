@@ -11,7 +11,7 @@ sudo pip install pandoc-latex-environment
 
 cp -v cocktail.conf.smp cocktail.conf
 MYHOME=$(pwd)
-cd ..
+cd
 git clone https://github.com/hugoroy/exegetesDoc.git
 git clone https://github.com/sniperovitch/mirrorpad.git
 cd mirrorpad
