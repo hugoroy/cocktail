@@ -1,19 +1,11 @@
 language: perl
+sudo: required
 branches:
   except:
     - refactoring
     - dev
   only:
     - master
-before_install:
-  - wget https://github.com/jgm/pandoc/releases/download/1.19.2.1/pandoc-1.19.2.1-1-amd64.deb
-  - sudo dpkg -i *.deb
-  - sudo apt-get -qq update
-  - sudo apt-get install -y texlive-latex-base texlive-font-utils texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra
-  - sudo apt-get install -y python-pip
-  - sudo pip install pandoc-latex-environment
-  - sudo /home/travis/perl5/perlbrew/bin/cpanm Etherpad Config::YAML LWP LWP::Protocol::https Encode URI::Encode
-  - sudo ./build.sh
 notifications:
   irc:
     channels:
@@ -23,7 +15,14 @@ notifications:
       - "Change view : %{compare_url} Build details : %{build_url}"
       - "%{commit_message}"
     use_notice: true
-install: true
+install:
+  - wget https://github.com/jgm/pandoc/releases/download/1.19.2.1/pandoc-1.19.2.1-1-amd64.deb
+  - sudo dpkg -i *.deb
+  - sudo apt-get -qq update
+  - sudo apt-get install -y texlive-latex-base texlive-font-utils texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra
+  - sudo apt-get install -y python-pip
+  - sudo pip install pandoc-latex-environment
+  - cpanm --notest Config::YAML Encode URI::Encode LWP::UserAgent LWP::Protocol::https Etherpad
+  - sudo ./build.sh
 script:
   - t/alltests
-
