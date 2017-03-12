@@ -1,0 +1,73 @@
+#!/bin/bash
+
+printf "$PRINTFPATTERN" $0 : "2 Compilations. 1 Dossier. 2 Projets. Pad Public. export/txt"
+
+URL_BASE=https%3A%2F%2Fpad.exegetes.eu.org%2Fp%2Fg.DSXI1kGFT1gjor66%24Abro-REP-Tele2-Principal%2Fexport%2Ftxt
+URL_GARDE=https%3A%2F%2Fpad.exegetes.eu.org%2Fp%2Fg.DSXI1kGFT1gjor66%24Abro-REP-Tele2-Garde%2Fexport%2Ftxt
+DOSSIER=MonDossier$$
+PROJET1=Abro2$$
+PROJET2=Abro3
+
+# pids conserve la liste des pids
+# retcode conserve le code retour de chaque pid une fois terminé
+handle_child() {
+  local tmp=()
+  for((i=0;i<${#pids[@]};++i));
+  do
+    if test ! -d /proc/${pids[i]};
+    then
+      wait ${pids[i]}
+      retcode[${pids[i]}]=$?
+    else
+      tmp+=(${pids[i]})
+    fi
+  done
+  pids=(${tmp[@]})
+}
+
+set -o monitor
+trap "handle_child" CHLD
+
+
+# Start background processes
+OUTPUT1=$(./cocktail -v \
+           -d "$DOSSIER" \
+           -p "$PROJET1" \
+           -b "$URL_BASE" \
+           -g "$URL_GARDE" 2>&1 >/dev/null &)
+pids+=($!)
+
+OUTPUT2=$(./cocktail -v \
+           -d "$DOSSIER" \
+           -p "$PROJET2" \
+           -b "$URL_BASE" \
+           -g "$URL_GARDE" 2>&1 >/dev/null &)
+pids+=($!)
+
+# Wait until all background processes are stopped
+while [ ${#pids[@]} -gt 0 ];
+do
+  # echo "WAITING FOR: ${pids[@]}";
+  sleep 3;
+done
+
+# affichage des code retour et generation de la chaine de test
+for pid in "${!retcode[@]}"
+do
+  statusstring="$statusstring $pid=${retcode[$pid]}"
+  retcodestr="${retcodestr}${retcode[$pid]}"
+done
+echo -n "RC $statusstring "
+
+if test $retcodestr -eq "00";
+then
+  echo "[  OK  ]"
+  echo "$OUTPUT1"
+  echo "$OUTPUT2"
+  exit 0
+else
+  echo "[FAILED]"
+  echo "$OUTPUT1"
+  echo "$OUTPUT2"
+  exit 1
+fi
