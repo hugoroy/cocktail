@@ -1,12 +1,11 @@
 #!/bin/bash
 
-printf "$PRINTFPATTERN" $0 : "2 Compilations. 1 Dossier. 2 Projets. Pad Public. export/txt"
+printf "$PRINTFPATTERN" $0 : "2 Compilations. 1 Dossier. 1 Projet. Pad Public. export/txt"
 
 URL_BASE=https%3A%2F%2Fpad.exegetes.eu.org%2Fp%2Fg.DSXI1kGFT1gjor66%24Abro-REP-Tele2-Principal%2Fexport%2Ftxt
 URL_GARDE=https%3A%2F%2Fpad.exegetes.eu.org%2Fp%2Fg.DSXI1kGFT1gjor66%24Abro-REP-Tele2-Garde%2Fexport%2Ftxt
 DOSSIER=MonDossier$$
-PROJET1=Abro2$$
-PROJET2=Abro3
+PROJET=Abro2$$
 
 # pids conserve la liste des pids
 # retcode conserve le code retour de chaque pid une fois terminé
@@ -32,7 +31,7 @@ trap "handle_child" CHLD
 # Start background processes
 OUTPUT1=$(./cocktail -v \
            -d "$DOSSIER" \
-           -p "$PROJET1" \
+           -p "$PROJET" \
            -b "$URL_BASE" \
            -g "$URL_GARDE" 2>&1 >/dev/null) &
 pids+=($!)
@@ -40,7 +39,7 @@ OUTPUT=$(printf "%s\n%s" "$OUTPUT" "START $!")
 
 OUTPUT2=$(./cocktail -v \
            -d "$DOSSIER" \
-           -p "$PROJET2" \
+           -p "$PROJET" \
            -b "$URL_BASE" \
            -g "$URL_GARDE" 2>&1 >/dev/null) &
 pids+=($!)
@@ -62,7 +61,7 @@ do
 done
 echo -n "RC $statusstring "
 
-if test "$retcodestr" -eq "00";
+if test $retcodestr -eq "02" -o $retcodestr -eq "20";
 then
   echo "[  OK  ]"
   echo "$OUTPUT"
