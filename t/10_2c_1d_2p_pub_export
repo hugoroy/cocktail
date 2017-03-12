@@ -47,8 +47,8 @@ pids+=($!)
 # Wait until all background processes are stopped
 while [ ${#pids[@]} -gt 0 ];
 do
-  # echo "WAITING FOR: ${pids[@]}";
-  sleep 3;
+  echo "WAITING FOR: ${pids[@]}";
+  sleep 2;
 done
 
 # affichage des code retour et generation de la chaine de test
@@ -59,15 +59,18 @@ do
 done
 echo -n "RC $statusstring "
 
-if test $retcodestr -eq "00";
+if test "$retcodestr" -eq "00";
 then
   echo "[  OK  ]"
   echo "$OUTPUT1"
+  echo "---"
   echo "$OUTPUT2"
   exit 0
 else
   echo "[FAILED]"
   echo "$OUTPUT1"
+  echo "---"
   echo "$OUTPUT2"
   exit 1
 fi
+
