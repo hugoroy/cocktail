@@ -9,7 +9,7 @@ sudo apt-get install -y texlive-latex-base texlive-font-utils texlive-latex-reco
 sudo apt-get install -y python-pip
 sudo pip install pandoc-latex-environment
 
-cp -v cocktail.conf.smp cocktail.conf
+cp -v $HOME/cocktail/cocktail.conf.smp $HOME/cocktail/cocktail.conf
 cd
 git clone https://github.com/hugoroy/exegetesDoc.git
 git clone https://github.com/sniperovitch/mirrorpad.git
