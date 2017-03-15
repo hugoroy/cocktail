@@ -4,8 +4,14 @@ testOK=0
 testFAILED=0
 testSKIPPED=0
 testCOUNT=0
+
+# Est utilisé dans les script appelés pour formater la sortie
 export PRINTFPATTERN='%-31s %s %-70s'
-for test in t/*;
+
+# Par défaut lance tous les scripts dans t/, qui sont executables sauf lui même (altests)
+# si un argument est donné il lance les scripts qui correspondent à $1* 
+# exemple t/alltest 1 pour lancer tous les tests qui commencent par 1
+for test in t/$1*;
 do
   if test -x "$test" -a "$test" != "$0";
   then
