@@ -8,6 +8,7 @@ DOSSIER=MonDossier$$
 PROJET=Abro2$$
 
 OUTPUT=$(./cocktail -v \
+           -a sHaKe \
            -d "$DOSSIER" \
            -p "$PROJET" \
            -b "$URL_BASE" \

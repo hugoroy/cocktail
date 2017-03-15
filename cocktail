@@ -9,6 +9,7 @@ RC_PANDOC_FILES=5
 RC_ARGS=6
 RC_ARGS_DOSSIER=7
 RC_ARGS_PROJET=8
+RC_ARGS_ACTION=9
 
 end_with_code() {
   local rc=$1
@@ -432,9 +433,14 @@ else
 fi
 
 OPTERR=1
-while getopts "b:d:g:p:hv" option;
+while getopts "a:b:d:g:p:hv" option;
 do
   case $option in
+    a)
+        # ATTENTION   ^^   =  passage en majuscules
+        ACTION="${OPTARG^^}"
+        verbose "getopts: -$option) ACTION=$ACTION"
+        ;;
     b)
         URL_BASE=$OPTARG
         verbose "getopts: -$option) URL_BASE=$URL_BASE"
@@ -465,6 +471,26 @@ done
 
 shift $(($OPTIND - 1))
 verbose "ARGS=$@"
+
+
+###############################################################################
+# GESTION DES ARGUMENTS DE LA LIGNE DE COMMANDE
+###############################################################################
+
+# ACTION : SHAKE est la valeur par défaut
+if test -z "$ACTION";
+then
+  ACTION="SHAKE"
+fi
+
+# ACTION : uniquement SHAKE ou UNLOCK
+if test "$ACTION" != "SHAKE" -a "$ACTION" != "UNLOCK";
+then
+  die "getopts: -a ne peut être que SHAKE ou UNLOCK" $RC_ARGS_ACTION
+fi
+verbose "ACTION=$ACTION"
+
+
 
 if test -z "$DOSSIER";
 then
