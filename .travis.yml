@@ -3,9 +3,9 @@ sudo: required
 branches:
   except:
     - refactoring
-    - dev
   only:
     - master
+    - dev
 notifications:
   irc:
     channels:
