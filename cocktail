@@ -385,7 +385,7 @@ publish() {
     die "[$FUNCNAME] the folder '$dst_folder' does not exists"
   fi
 
-  for ext in pdf docx html txt
+  for ext in pdf docx html tex txt
   do
     local from="$src_folder/$PROJET.$ext"
     local to="$dst_folder/$PROJET.$ext"
