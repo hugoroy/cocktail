@@ -234,7 +234,7 @@ pad2markdown() {
 
   RESPONSE=$(pandoc \
     -f markdown "$input" \
-    -o "$output" -t markdown --wrap=none --self-contained --smart \
+    -o "$output" -t markdown_strict --wrap=none --self-contained --smart \
     --reference-location=block --reference-links \
     --filter pandoc-citeproc \
     --filter $PANDOC_FILTER_BASE/markdown.zsh \
@@ -265,6 +265,35 @@ pad2tex() {
     -f markdown "$input" \
     -o "$output" -t latex --self-contained \
     --template ../../exegetesDoc/pandocincludes/exegetes.latex \
+    --filter pandoc-citeproc \
+    --filter $PANDOC_FILTER_BASE/latex.zsh \
+    --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
+    --filter pandoc-latex-environment \
+    --filter $PANDOC_FILTER_BASE/paranumero.bash)
+  RC=$?
+  local errstr="[$FUNCNAME] RC=[$RC] $RESPONSE"
+  if test "$RC" -eq 0;
+  then
+    verbose "$errstr"
+  else
+    die "$errstr"
+  fi
+}
+
+pad2texinput() {
+  debug "[$FUNCNAME] ARGS:$@"
+  if test $# -ne 2;
+  then
+    die 'usage: [$FUNCNAME] input_file output_file'
+  fi
+
+  local input=$1
+  local output=$2
+  verbose "[$FUNCNAME] input=$input output=$output"
+
+  RESPONSE=$(pandoc \
+    -f markdown "$input" \
+    -o "$output" -t latex \
     --filter pandoc-citeproc \
     --filter $PANDOC_FILTER_BASE/latex.zsh \
     --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
@@ -542,8 +571,9 @@ touch "$WORKING_FOLDER/annexe-tableau.tex"
 pad2json "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.json"
 pad2docx "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.docx"
 pad2html "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.html"
-pad2markdown "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.markdown.txt"
+pad2markdown "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.md"
 pad2tex "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.tex"
+pad2texinput "$WORKING_FOLDER/$PROJET.txt" "$WORKING_FOLDER/$PROJET.texinput"
 tex2pdf "$WORKING_FOLDER/$PROJET.tex" "$WORKING_FOLDER/$PROJET.pdf"
 publish "$WORKING_FOLDER" "$STORE"
 unlock_project
