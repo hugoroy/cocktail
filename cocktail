@@ -166,7 +166,7 @@ pad2docx() {
 
   local input=$1
   local output=$2
-  local refdoc="$PANDOC_INCLUDE_BASE/exegetes.docx"
+  local refdoc="$PANDOC_INCLUDE_BASE/spinosi.docx"
   verbose "[$FUNCNAME] input=$input output=$output"
 
   if ! test -e "$refdoc";
