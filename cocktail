@@ -234,10 +234,10 @@ pad2markdown() {
 
   RESPONSE=$(pandoc \
     -f markdown "$input" \
-    -o "$output" -t markdown_strict --wrap=none --self-contained --smart \
+    -o "$output" -t markdown_strict --wrap=none --smart \
     --reference-location=block --reference-links \
     --filter pandoc-citeproc \
-    --filter $PANDOC_FILTER_BASE/markdown.zsh \
+    --filter $PANDOC_FILTER_BASE/markdown_strict.zsh \
     --filter $PANDOC_FILTER_BASE/nettoyage.zsh \
     --filter $PANDOC_FILTER_BASE/nettoyage-etendu.zsh)
   RC=$?
